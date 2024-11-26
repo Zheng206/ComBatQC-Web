@@ -1,0 +1,147 @@
+---
+title: "Post Harmonization"
+format: html
+---
+
+**ComBatFamQC** currently offers two types of post-harmonization downstream analysis tools: (1) **interactive life span age trend visualization** and (2) **customized residual generation**. The life span age trend visualization provides age centile fits for each brain structure, adjusted for sex and intracranial volume (ICV). The customized residual generation feature enables users to remove the effects of unwanted covariates while retaining those of interest in the harmonized data.
+
+# Interactive Life Span Age Trend
+
+To better demonstrate how to use the function in R, we utilized a simulated dataset, `age_df`, for illustration. Note that if you are implementing this in R, there are several essential steps to set up the workflow:
+
+-   Generate a list of structured datasets for all brain ROIs. Each ROI dataset should contain the following four columns:
+
+    -   **y**: ROI value
+    -   **age**: subject's age information
+    -   **sex**: subject's sex information
+    -   **icv**: subject's intracranial volume
+
+::: {.callout-note collapse="true"}
+## R code
+```{r}
+# import the package and load the data
+library(ComBatFamQC)
+library(parallel)
+data(age_df)
+# specify parameters
+age_df = data.frame(age_df)
+features = colnames(age_df)[c(6:56)]
+age = "age"
+sex = "sex"
+icv = "ICV_baseline"
+age_df[[sex]] = as.factor(age_df[[sex]])
+# create sub_df for different features
+df_var = paste0("sub_df_", 1:length(features))
+for (i in 1:length(features)){
+  sub_df = age_df[,c(features[i], age, sex, icv)] %>% na.omit() 
+  colnames(sub_df) = c("y", "age", "sex", "icv")
+  assign(df_var[i], sub_df)
+}
+```
+:::
+
+-   Create age trend datasets for all ROIs.
+
+::: {.callout-note collapse="true"}
+## R code
+```{r}
+# For MAC users
+age_list = mclapply(1:length(features), function(w){
+  age_sub = age_list_gen (sub_df = eval(parse(text = paste0("sub_df_",w))),  lq = 0.25, hq = 0.75)
+  return(age_sub)
+}, mc.cores = detectCores()) 
+
+# For Windows users
+age_list = mclapply(1:length(features), function(w){
+  age_sub = age_list_gen (sub_df = eval(parse(text = paste0("sub_df_",w))),  lq = 0.25, hq = 0.75)
+  return(age_sub)
+}, mc.cores = 1) 
+
+names(age_list) = features
+
+quantile_type = c(paste0("quantile_", 100*0.25), "median", paste0("quantile_", 100*0.75))
+```
+:::
+
+-   Start an interactive session for age trend visualization.
+
+::: {.callout-note collapse="true"}
+## R code
+```{r}
+ComBatFamQC::age_shiny(age_list, features, quantile_type)
+```
+:::
+
+Alternatively, users can utilize the command-line interface via post_CLI.R. The essential steps have been streamlined, significantly simplifying the workflow and making it easier to get started. The following parameters must be assigned values:
+
+-   `--features/-f`: position of features/rois data(column numbers)
+-   `--AGE/-A`: column position of the age variable
+-   `--SEX/-S`: column position of the sex variable
+-   `--ICV/I`:  column position of the ICV variable
+-   `--Female/-F`: female indicator, the value represent female in the sex column.
+
+::: {.callout-tip collapse="true"}
+## CLI code
+```{bash, eval = FALSE}
+Rscript path/to/post_CLI.R path/to/data.csv -f 16-273 -A 9 -S 10 -I 11 -F "F"
+```
+:::
+
+![Age Trend Visualization](figure/age_trend.png)
+
+# Customized Residual Generation
+
+**ComBatFamQC** offers users the flexibility to create various sets of residuals by removing the effects of specific covariates. To maximize the utility of this feature, it is important to carefully choose parameters based on the type of regression and the covariates to be adjusted for.
+
+The tool provides two methods for generating residuals: 1) creating residuals from scratch and 2) deriving residuals from an existing model. Detailed examples are provided below. We continue to use the ADNI dataset for demonstration.
+
+## Generate Residuals from Scratch
+
+This approach requires users to refit the regression model.
+
+::: {.callout-note collapse="true"}
+## R code
+```{r}
+# get harmonized dataset
+features = colnames(adni)[c(43:104)]
+covariates = c("timedays", "AGE", "SEX", "DIAGNOSIS")
+interaction = c("timedays,DIAGNOSIS")
+batch = "manufac"
+combat_model = combat_harm(type = "lm", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = NULL, df = adni)
+harmonized_df = combat_model$harmonized_df
+# generate residuals by removing timedays and DIAGNOSIS effects, while preserving AGE and SEX effects.
+result_residual = residual_gen(type = "lm", features = features, covariates = covariates, interaction = interaction, smooth = NULL, df = harmonized_df, rm = c("timedays", "DIAGNOSIS"))
+# save residual data set
+write.csv(result_residual$residual, "path/to/save/residual.csv")
+# save regression model
+saveRDS(result_residual$model, "path/to/save/regression_model.rds")
+```
+:::
+
+::: {.callout-tip collapse="true"}
+## CLI code
+```{bash, eval = FALSE}
+Rscript path/to/post_CLI.R path/to/harmonized_data.csv -t residual --features 43-104 
+--covariates 9,11,13-14 -m lm --rm 9,14 --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds
+```
+:::
+
+
+## Generate Residuals from Existing Model
+
+This method requires users to supply a pre-trained model.
+
+::: {.callout-note collapse="true"}
+## R code
+```{r}
+result_residual = residual_gen(type = "lm", features = features, covariates = covariates, interaction = interaction, smooth = NULL, df = harmonized_df, rm = c("timedays", "DIAGNOSIS"), model = TRUE, model_path = "path/to/save/regression_model.rds")
+```
+:::
+
+::: {.callout-tip collapse="true"}
+## CLI code
+```{bash, eval = FALSE}
+Rscript path/to/post_CLI.R path/to/harmonized_data.csv -t residual --features 43-104 
+--covariates 9,11,13-14 -m lm --rm 9,14 --model.path /path/to/saved_model.rds --outdir /path/to/harmonized_data.csv 
+```
+:::

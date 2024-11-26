@@ -1,0 +1,116 @@
+---
+title: "Batch Effect Diagnostics"
+format: html
+---
+
+In this section, we will use a sample data included in this package to provide a thorough introduction to the key functionalities of the ComBatFamQC package for batch effect diagnostics.
+
+# Data
+
+The sample dataset in the package is the longitudinal cortical thickness data from the
+[Alzheimer’s Disease Neuroimaging Initiative](https://adni.loni.usc.edu/
+) (ADNI) study (Jack et al. (2008)), which con-
+tains cortical thickness measures of 62 regions from 663 unique participants with images
+collected longitudinally between 2-6 visits. The processed data can be downloaded from [GitHub](
+https://github.com/ntustison/CrossLong). 
+
+The key variables of interest are presented below:
+
+-   Batch variable: 
+    -   <span style="color:blueviolet;">*manufac*</span>: MRI manufacturer
+-   Covariates
+    -   <span style="color:darkseagreen;">*timedays*</span>: time related variable
+    -   <span style="color:darkseagreen;">*Age*</span>
+    -   <span style="color:darkseagreen;">*SEX*</span> 
+    -   <span style="color:darkseagreen;">*DIAGNOSIS*</span>: (AD, CN, LMCI)
+    
+    (We consider an interaction effect between *timedays* and *DIAGNOSIS*)
+-   Features to harmonize
+    -   62 <span style="color:coral;">cortical thickness</span> regions
+-   Random Effect
+    -   <span style="color:cornflowerblue;">*subid*</span> : Subject IDs.
+
+# Interactive Batch Effect Diagnostics
+
+Users can launch the Shiny app using the following code:
+
+::: {.callout-note collapse="true"}
+## R code
+```{r}
+features = colnames(adni)[c(43:104)]
+covariates = c("timedays", "AGE", "SEX", "DIAGNOSIS")
+interaction = c("timedays,DIAGNOSIS")
+batch = "manufac"
+result_orig = visual_prep(type = "lm", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = NULL, df = adni)
+comfam_shiny(result_orig)
+```
+:::
+
+::: {.callout-tip collapse="true"}
+## CLI code
+```{bash, eval = FALSE}
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v TRUE --features 43-104 --covariates 9,11,13-14 -b 16 -i 9*14 -m lm 
+```
+:::
+
+## Data Overview
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/d20G6R25b0Y >}}
+
+ComBatFamQC: Data Overview
+
+:::
+
+## Summary
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/S9ibibL56bQ >}}
+
+ComBatFamQC: Summary
+
+:::
+
+## Residial Plot
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/axKWqHL1rWI >}}
+
+ComBatFamQC: Residual Plot
+
+:::
+
+## Diagnosis of Global Batch Effect
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/13B-B7_ZzGo >}}
+
+ComBatFamQC: Diagnosis of Global Batch Effect
+
+:::
+
+## Diagnosis of Individual Batch Effect
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/cPLLbMQNchs >}}
+
+ComBatFamQC: Diagnosis of Individual Batch Effect
+
+:::
+
+## Interactive Harmonization
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/g1C3bsZIqqs >}}
+
+ComBatFamQC: Interactive Harmonization
+
+:::
+
+

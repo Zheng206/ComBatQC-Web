@@ -1,0 +1,26 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "ComBatFamQC"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - about.qmd
+      - diagnostic.qmd
+      - harmonization.qmd
+      - post.qmd
+
+format:
+  html:
+    theme: minty
+    css: styles.css
+    toc: true
+
+execute:
+  freeze: auto
+  echo: true
+  eval: false
+
