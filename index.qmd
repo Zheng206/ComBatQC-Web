@@ -8,7 +8,7 @@ By providing interactive qualitative visualization alongside rigorous statistica
 includes functions to easily generate covariate-corrected residuals that could be used as inputs
 for downstream machine learning models.
 
-![ComBatFamQC Diagram](figure/QC_diagram.png)
+![ComBatFamQC Diagram](figure/ComBatFamQC.png)
 
 The package leverages the capabilities of **R Shiny** to offer interactive visualizations for both batch effect diagnostics and age trend analysis, presenting data in an accessible format that enhances interpretability.
 
