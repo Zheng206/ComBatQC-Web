@@ -18,8 +18,15 @@ There are two types of harmonization scenarios users can choose from:
     -   harmonize new data toward existing reference data (works for all built-in ComBat harmonization methods)
 
 # First Harmonization
+___
 
 Specify parameters carefully based on the harmonization method to be applied.
+
+Users can also use the command-line interface via **ComBatQC_CLI.R** to start the harmonization stage. Apart from the same required parameters as the diagnosis stage(`features`, `covariates`, `batch`, `smooth`, `random`), using the command-line interface also requires users to set the following parameter:
+
+-   `--diagnosis/-d`: FALSE
+-   `--outdir`: Path to save the harmonized dataset (in .csv format)
+-   `--mout`: Path to save the ComBat model (optional if users do not wish to save the model; in .rds format)
 
 ## Original ComBat
 
@@ -28,11 +35,11 @@ A method designed for batch effect correction in cross-sectional data with linea
 ::: {.callout-note collapse="true"}
 ## R code
 ```{r}
-features = colnames(adni)[c(43:104)]
-covariates = c("timedays", "AGE", "SEX", "DIAGNOSIS")
-interaction = c("timedays,DIAGNOSIS")
-batch = "manufac"
-combat_model = combat_harm(type = "lm", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = NULL, df = adni)
+features <- colnames(adni)[c(43:104)]
+covariates <- c("timedays", "AGE", "SEX", "DIAGNOSIS")
+interaction <- c("timedays,DIAGNOSIS")
+batch <- "manufac"
+combat_model <- combat_harm(type = "lm", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = NULL, df = adni)
 head(combat_model$harmonized_df)
 ```
 :::
@@ -40,7 +47,7 @@ head(combat_model$harmonized_df)
 ::: {.callout-tip collapse="true"}
 ## CLI code
 ```{bash, eval = FALSE}
-Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --features 43-104 
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -d FALSE --features 43-104 
 --covariates 9,11,13-14 -b 16 -i 9*14 -m lm --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds
 ```
 :::
@@ -52,7 +59,7 @@ A method accounts for intra-subject correlation in longitudinal data by incorpor
 ::: {.callout-note collapse="true"}
 ## R code
 ```{r}
-combat_model_lmer = combat_harm(type = "lmer", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = "subid", df = adni)
+combat_model_lmer <- combat_harm(type = "lmer", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = "subid", df = adni)
 head(combat_model_lmer$harmonized_df)
 ```
 :::
@@ -60,7 +67,7 @@ head(combat_model_lmer$harmonized_df)
 ::: {.callout-tip collapse="true"}
 ## CLI code
 ```{bash, eval = FALSE}
-Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --features 43-104 
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -d FALSE --features 43-104 
 --covariates 9,11,13-14 -b 16 -i 9*14 -m lmer -r 3 --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds
 ```
 :::
@@ -73,7 +80,7 @@ A method allows for preservation of non-linear covariate effects through use of 
 ::: {.callout-note collapse="true"}
 ## R code
 ```{r}
-combat_model_gam = combat_harm(type = "gam", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = "AGE", smooth_int_type = "linear", df = adni)
+combat_model_gam <- combat_harm(type = "gam", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = "AGE", smooth_int_type = "linear", df = adni)
 head(combat_model_gam$harmonized_df)
 ```
 :::
@@ -81,7 +88,7 @@ head(combat_model_gam$harmonized_df)
 ::: {.callout-tip collapse="true"}
 ## CLI code
 ```{bash, eval = FALSE}
-Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --features 43-104 
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -d FALSE --features 43-104 
 --covariates 9,11,13-14 -b 16 -i 9*14 -m gam -s 11 --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds
 ```
 :::
@@ -93,7 +100,7 @@ CovBat is used for correcting covariance batch effects.
 ::: {.callout-note collapse="true"}
 ## R code
 ```{r}
-covbat_model = combat_harm(type = "gam", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth_int_type = "linear", smooth = "AGE", df = adni, family = "covfam")
+covbat_model <- combat_harm(type = "gam", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth_int_type = "linear", smooth = "AGE", df = adni, family = "covfam")
 head(covbat_model$harmonized_df)
 ```
 :::
@@ -101,12 +108,13 @@ head(covbat_model$harmonized_df)
 ::: {.callout-tip collapse="true"}
 ## CLI code
 ```{bash, eval = FALSE}
-Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --features 43-104 
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -d FALSE --features 43-104 
 --covariates 9,11,13-14 -b 16 -i 9*14 -m gam -s 11 -f covfam --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds
 ```
 :::
 
 # Out-of-Sample Harmonization
+___
 
 ## from ComBat Model
 
@@ -115,15 +123,20 @@ Specify `predict` parameter to be TRUE and `object` parameter to be saved ComBat
 ::: {.callout-note collapse="true"}
 ## R code
 ```{r}
-saved_model = combat_model_gam$combat.object
-harm_predict = combat_harm(df = adni %>% head(1000), predict = TRUE, object = saved_model)
+saved_model <- combat_model_gam$combat.object
+harm_predict <- combat_harm(df = adni %>% head(1000), predict = TRUE, object = saved_model)
 ```
 :::
+
+Using the command-line interface requires users to set the following parameter:
+
+-   `--predict`: TRUE
+-   `--object/-o`: Path to the saved ComBat model (in .rds format)
 
 ::: {.callout-tip collapse="true"}
 ## CLI code
 ```{bash, eval = FALSE}
-Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --predict TRUE -o path/to/saved_model.rds --outdir /path/to/harmonized_data.csv
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -d FALSE --predict TRUE -o path/to/saved_model.rds --outdir /path/to/harmonized_data.csv
 ```
 :::
 
@@ -135,22 +148,26 @@ Specify `reference` parameter to be saved reference data. To be noticed, the ref
 ## R code
 ```{r}
 # harmonize reference data
-reference_site = adni %>% group_by(site) %>% summarize(count = n()) %>% arrange(desc(count)) %>% pull(site) %>% head(30)
-reference_df = adni %>% filter(site %in% reference_site)
-features = colnames(reference_df)[c(43:104)]
-covariates = c("timedays", "AGE", "SEX", "DIAGNOSIS")
-interaction = c("timedays,DIAGNOSIS")
-batch = "site"
-ref_model = combat_harm(type = "lmer", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = "subid", df = reference_df)
+reference_site <- adni %>% group_by(site) %>% summarize(count = n()) %>% arrange(desc(count)) %>% pull(site) %>% head(30)
+reference_df <- adni %>% filter(site %in% reference_site)
+features <- colnames(reference_df)[c(43:104)]
+covariates <- c("timedays", "AGE", "SEX", "DIAGNOSIS")
+interaction <- c("timedays,DIAGNOSIS")
+batch <- "site"
+ref_model <- combat_harm(type = "lmer", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = "subid", df = reference_df)
 
 # harmonize new data to the reference data
-harm_new = combat_harm(type = "lmer", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = "subid", df = adni, reference = ref_model$harmonized_df)
+harm_new <- combat_harm(type = "lmer", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = "subid", df = adni, reference = ref_model$harmonized_df)
 ```
 :::
+
+Using the command-line interface requires users to set the following parameter:
+
+-   `--reference`: Path to the reference dataset 
 
 ::: {.callout-tip collapse="true"}
 ## CLI code
 ```{bash, eval = FALSE}
-Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --features 43-104 --covariates 9,11,13-14 -b 16 -i 9*14 -m lmer -r 3 --reference path/to/reference.csv --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -d FALSE --features 43-104 --covariates 9,11,13-14 -b 16 -i 9*14 -m lmer -r 3 --reference path/to/reference.csv --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds
 ```
 :::

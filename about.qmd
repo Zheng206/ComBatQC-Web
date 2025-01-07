@@ -1,8 +1,7 @@
 ---
-title: "About"
+title: "Introduction to ComBatFamQC"
 ---
 
-# Introduction
 
 Beginning with unharmonized data, users can initiate an interactive batch effect diagnostic session that provides detailed qualitative visualizations and statistical test results, which help justify the need for data harmonization. The Shiny app also features an interactive harmonization session, allowing users to easily configure harmonization parameters and efficiently harmonize their data. Alternatively, users have the option to use either R or the command-line interface for for harmonizing larger datasets. 
 
@@ -20,7 +19,7 @@ library(devtools)
 
 # Method 1: install ComBatFamily and ComBatFamQC seperatelly
 devtools::install_github("andy1764/ComBatFamily")
-devtools::install_github("Zheng206/ComBatFamQC")
+devtools::install_github("Zheng206/ComBatFamQC", build_vignettes = TRUE)
 
 # Method 2: First, install ComBatFamQC without vignettes, then reinstall it with vignette building enabled.
 devtools::install_github("Zheng206/ComBatFamQC")

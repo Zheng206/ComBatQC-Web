@@ -6,6 +6,7 @@ format: html
 In this section, we will use a sample data included in this package to provide a thorough introduction to the key functionalities of the ComBatFamQC package for batch effect diagnostics.
 
 # Data
+___
 
 The sample dataset in the package is the longitudinal cortical thickness data from the
 [Alzheimer’s Disease Neuroimaging Initiative](https://adni.loni.usc.edu/
@@ -31,25 +32,36 @@ The key variables of interest are presented below:
     -   <span style="color:cornflowerblue;">*subid*</span> : Subject IDs.
 
 # Interactive Batch Effect Diagnostics
+___
 
 Users can launch the Shiny app using the following code:
 
 ::: {.callout-note collapse="true"}
 ## R code
 ```{r}
-features = colnames(adni)[c(43:104)]
-covariates = c("timedays", "AGE", "SEX", "DIAGNOSIS")
-interaction = c("timedays,DIAGNOSIS")
-batch = "manufac"
-result_orig = visual_prep(type = "lm", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = NULL, df = adni)
-comfam_shiny(result_orig)
+features <- colnames(adni)[c(43:104)]
+covariates <- c("timedays", "AGE", "SEX", "DIAGNOSIS")
+interaction <- c("timedays,DIAGNOSIS")
+batch <- "manufac"
+result_lmer <- visual_prep(type = "lmer", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = "subid", df = adni)
+comfam_shiny(result_lmer)
 ```
 :::
+
+Alternatively, users can utilize the command-line interface via **ComBatQC_CLI.R**. The essential steps have been streamlined, significantly simplifying the workflow and making it easier to get started. The following parameters must be assigned values:
+
+-   `--diagnosis/-d`: TRUE (by default)
+-   `--visualization/-v`: TRUE (by default)
+-   `--features/-f`: position of features/rois data (column numbers)
+-   `--covariates/-c`: column position of the covariates whose effects should be preserved
+-   `--batch/-b`: column position of the batch variable
+-   `--smooth/-s`:  column position of the smooth term (if a gam model is used)
+-   `--random/-r`: column position of the random effect term (if a lmer model is used)
 
 ::: {.callout-tip collapse="true"}
 ## CLI code
 ```{bash, eval = FALSE}
-Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v TRUE --features 43-104 --covariates 9,11,13-14 -b 16 -i 9*14 -m lm 
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -d TRUE -v TRUE --features 43-104 --covariates 9,11,13-14 -b 16 -i 9*14 -r 3 -m lmer 
 ```
 :::
 
@@ -57,7 +69,7 @@ Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v TRUE --features 
 
 ::: {#fig-cern}
 
-{{< video https://youtu.be/d20G6R25b0Y >}}
+{{< video https://youtu.be/5OJU4oVZ6Ow >}}
 
 ComBatFamQC: Data Overview
 
@@ -67,7 +79,7 @@ ComBatFamQC: Data Overview
 
 ::: {#fig-cern}
 
-{{< video https://youtu.be/S9ibibL56bQ >}}
+{{< video https://youtu.be/cLI9WkCPLF8 >}}
 
 ComBatFamQC: Summary
 
@@ -77,7 +89,7 @@ ComBatFamQC: Summary
 
 ::: {#fig-cern}
 
-{{< video https://youtu.be/axKWqHL1rWI >}}
+{{< video https://youtu.be/EME2-E3UEXI >}}
 
 ComBatFamQC: Residual Plot
 
@@ -87,7 +99,7 @@ ComBatFamQC: Residual Plot
 
 ::: {#fig-cern}
 
-{{< video https://youtu.be/13B-B7_ZzGo >}}
+{{< video https://youtu.be/-CDK0qx5_xI >}}
 
 ComBatFamQC: Diagnosis of Global Batch Effect
 
@@ -97,7 +109,7 @@ ComBatFamQC: Diagnosis of Global Batch Effect
 
 ::: {#fig-cern}
 
-{{< video https://youtu.be/cPLLbMQNchs >}}
+{{< video https://youtu.be/UBTw3REUlSw >}}
 
 ComBatFamQC: Diagnosis of Individual Batch Effect
 
@@ -107,10 +119,33 @@ ComBatFamQC: Diagnosis of Individual Batch Effect
 
 ::: {#fig-cern}
 
-{{< video https://youtu.be/g1C3bsZIqqs >}}
+{{< video https://youtu.be/CyAxIY9Cagk >}}
 
 ComBatFamQC: Interactive Harmonization
 
 :::
 
 
+# Export Batch Effect Diagnosis Result
+___
+
+Users can save the batch effect diagnosis result using the following code:
+
+::: {.callout-note collapse="true"}
+## R code
+```{r}
+diag_save(path = "path/to/dir", result = result_lmer)
+```
+:::
+
+Using the command-line interface requires users to set the following parameter:
+
+-   `--visualization/-v`: FALSE
+-   `--outdir`: Path to a directory for saving the batch effect diagnosis result
+
+::: {.callout-tip collapse="true"}
+## CLI code
+```{bash, eval = FALSE}
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -d TRUE -v FALSE --features 43-104 --covariates 9,11,13-14 -b 16 -i 9*14 -r 3 -m lmer --outdir /path/to/dir
+```
+:::

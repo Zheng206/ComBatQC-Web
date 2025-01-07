@@ -143,24 +143,43 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html">
+    <a class="nav-link" href="./index.html"><i class="bi bi-house-heart" role="img">
+</i> 
  <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html">
- <span class="menu-text">About</span></a>
+    <a class="nav-link" href="./about.html"><i class="bi bi-book-half" role="img">
+</i> 
+ <span class="menu-text">Start</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./diagnostic.html">
- <span class="menu-text">Batch Effect Diagnostics</span></a>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-tutorials" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-collection-play-fill" role="img">
+</i> 
+ <span class="menu-text">Tutorials</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-tutorials">    
+        <li>
+    <a class="dropdown-item" href="./diagnostic.html"><i class="bi bi-window" role="img">
+</i> 
+ <span class="dropdown-text">Batch Effect Diagnosis</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./harmonization.html">
- <span class="menu-text">Harmonization</span></a>
+        <li>
+    <a class="dropdown-item" href="./harmonization.html"><i class="bi bi-clipboard-data" role="img">
+</i> 
+ <span class="dropdown-text">Harmonization</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link active" href="./post.html" aria-current="page">
- <span class="menu-text">Post Harmonization</span></a>
+        <li>
+    <a class="dropdown-item" href="./post.html"><i class="bi bi-graph-up" role="img">
+</i> 
+ <span class="dropdown-text">Post-Harmonization Downstream Analysis</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Zheng206/ComBatFamQC"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
   </li>  
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
@@ -178,6 +197,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
    
   <ul>
   <li><a href="#interactive-life-span-age-trend" id="toc-interactive-life-span-age-trend" class="nav-link active" data-scroll-target="#interactive-life-span-age-trend">Interactive Life Span Age Trend</a></li>
+  <li><a href="#export-age-trend-table-and-gamlss-model" id="toc-export-age-trend-table-and-gamlss-model" class="nav-link" data-scroll-target="#export-age-trend-table-and-gamlss-model">Export Age Trend Table and GAMLSS Model</a></li>
   <li><a href="#customized-residual-generation" id="toc-customized-residual-generation" class="nav-link" data-scroll-target="#customized-residual-generation">Customized Residual Generation</a>
   <ul class="collapse">
   <li><a href="#generate-residuals-from-scratch" id="toc-generate-residuals-from-scratch" class="nav-link" data-scroll-target="#generate-residuals-from-scratch">Generate Residuals from Scratch</a></li>
@@ -209,11 +229,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><strong>ComBatFamQC</strong> currently offers two types of post-harmonization downstream analysis tools: (1) <strong>interactive life span age trend visualization</strong> and (2) <strong>customized residual generation</strong>. The life span age trend visualization provides age centile fits for each brain structure, adjusted for sex and intracranial volume (ICV). The customized residual generation feature enables users to remove the effects of unwanted covariates while retaining those of interest in the harmonized data.</p>
 <section id="interactive-life-span-age-trend" class="level1">
 <h1>Interactive Life Span Age Trend</h1>
+<hr>
 <p>To better demonstrate how to use the function in R, we utilized a simulated dataset, <code>age_df</code>, for illustration. Note that if you are implementing this in R, there are several essential steps to set up the workflow:</p>
 <ul>
 <li><p>Generate a list of structured datasets for all brain ROIs. Each ROI dataset should contain the following four columns:</p>
 <ul>
-<li><strong>y</strong>: ROI value</li>
+<li><strong>roi.name</strong>: ROI value</li>
 <li><strong>age</strong>: subject’s age information</li>
 <li><strong>sex</strong>: subject’s sex information</li>
 <li><strong>icv</strong>: subject’s intracranial volume</li>
@@ -237,19 +258,18 @@ R code
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(parallel)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(age_df)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># specify parameters</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>age_df <span class="ot">=</span> <span class="fu">data.frame</span>(age_df)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>features <span class="ot">=</span> <span class="fu">colnames</span>(age_df)[<span class="fu">c</span>(<span class="dv">6</span><span class="sc">:</span><span class="dv">56</span>)]</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>age <span class="ot">=</span> <span class="st">"age"</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>sex <span class="ot">=</span> <span class="st">"sex"</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>icv <span class="ot">=</span> <span class="st">"ICV_baseline"</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>age_df[[sex]] <span class="ot">=</span> <span class="fu">as.factor</span>(age_df[[sex]])</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>age_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(age_df)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>features <span class="ot">&lt;-</span> <span class="fu">colnames</span>(age_df)[<span class="fu">c</span>(<span class="dv">6</span><span class="sc">:</span><span class="dv">56</span>)]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="st">"age"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>sex <span class="ot">&lt;-</span> <span class="st">"sex"</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>icv <span class="ot">&lt;-</span> <span class="st">"ICV_baseline"</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>age_df[[sex]] <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(age_df[[sex]])</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># create sub_df for different features</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>df_var <span class="ot">=</span> <span class="fu">paste0</span>(<span class="st">"sub_df_"</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(features))</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(features)){</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  sub_df <span class="ot">=</span> age_df[,<span class="fu">c</span>(features[i], age, sex, icv)] <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>() </span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(sub_df) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"y"</span>, <span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"icv"</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">assign</span>(df_var[i], sub_df)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>sub_df_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(<span class="fu">length</span>(features)), <span class="cf">function</span>(i){</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    sub_df <span class="ot">&lt;-</span> df[,<span class="fu">c</span>(features[i], age, sex, icv)] <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>()</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">colnames</span>(sub_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(features[i], <span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"icv"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(sub_df)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -271,20 +291,20 @@ R code
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For MAC users</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>age_list <span class="ot">=</span> <span class="fu">mclapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(features), <span class="cf">function</span>(w){</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  age_sub <span class="ot">=</span> <span class="fu">age_list_gen</span> (<span class="at">sub_df =</span> <span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> <span class="fu">paste0</span>(<span class="st">"sub_df_"</span>,w))),  <span class="at">lq =</span> <span class="fl">0.25</span>, <span class="at">hq =</span> <span class="fl">0.75</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>age_list <span class="ot">&lt;-</span> <span class="fu">mclapply</span>(<span class="fu">seq_len</span>(<span class="fu">length</span>(features)), <span class="cf">function</span>(w){</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  age_sub <span class="ot">&lt;-</span> <span class="fu">age_list_gen</span> (<span class="at">sub_df =</span> sub_df_list[[w]],  <span class="at">lq =</span> <span class="fl">0.25</span>, <span class="at">hq =</span> <span class="fl">0.75</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(age_sub)</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>}, <span class="at">mc.cores =</span> <span class="fu">detectCores</span>()) </span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># For Windows users</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>age_list <span class="ot">=</span> <span class="fu">mclapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(features), <span class="cf">function</span>(w){</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  age_sub <span class="ot">=</span> <span class="fu">age_list_gen</span> (<span class="at">sub_df =</span> <span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> <span class="fu">paste0</span>(<span class="st">"sub_df_"</span>,w))),  <span class="at">lq =</span> <span class="fl">0.25</span>, <span class="at">hq =</span> <span class="fl">0.75</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>age_list <span class="ot">&lt;-</span> <span class="fu">mclapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(features), <span class="cf">function</span>(w){</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  age_sub <span class="ot">&lt;-</span> <span class="fu">age_list_gen</span> (<span class="at">sub_df =</span> sub_df_list[[w]],  <span class="at">lq =</span> <span class="fl">0.25</span>, <span class="at">hq =</span> <span class="fl">0.75</span>)</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(age_sub)</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>}, <span class="at">mc.cores =</span> <span class="dv">1</span>) </span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(age_list) <span class="ot">=</span> features</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(age_list) <span class="ot">&lt;-</span> features</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>quantile_type <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">"quantile_"</span>, <span class="dv">100</span><span class="sc">*</span><span class="fl">0.25</span>), <span class="st">"median"</span>, <span class="fu">paste0</span>(<span class="st">"quantile_"</span>, <span class="dv">100</span><span class="sc">*</span><span class="fl">0.75</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>quantile_type <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">"quantile_"</span>, <span class="dv">100</span><span class="sc">*</span><span class="fl">0.25</span>), <span class="st">"median"</span>, <span class="fu">paste0</span>(<span class="st">"quantile_"</span>, <span class="dv">100</span><span class="sc">*</span><span class="fl">0.75</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -310,13 +330,13 @@ R code
 </div>
 </div>
 </div>
-<p>Alternatively, users can utilize the command-line interface via post_CLI.R. The essential steps have been streamlined, significantly simplifying the workflow and making it easier to get started. The following parameters must be assigned values:</p>
+<p>Alternatively, users can utilize the command-line interface via <strong>post_CLI.R</strong>. The essential steps have been streamlined, significantly simplifying the workflow and making it easier to get started. The following parameters must be assigned values:</p>
 <ul>
 <li><code>--features/-f</code>: position of features/rois data(column numbers)</li>
 <li><code>--AGE/-A</code>: column position of the age variable</li>
 <li><code>--SEX/-S</code>: column position of the sex variable</li>
 <li><code>--ICV/I</code>: column position of the ICV variable</li>
-<li><code>--Female/-F</code>: female indicator, the value represent female in the sex column.</li>
+<li><code>--Female/-F</code>: female indicator, the value represent female in the sex column</li>
 </ul>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
@@ -343,13 +363,9 @@ CLI code
 </figure>
 </div>
 </section>
-<section id="customized-residual-generation" class="level1">
-<h1>Customized Residual Generation</h1>
-<p><strong>ComBatFamQC</strong> offers users the flexibility to create various sets of residuals by removing the effects of specific covariates. To maximize the utility of this feature, it is important to carefully choose parameters based on the type of regression and the covariates to be adjusted for.</p>
-<p>The tool provides two methods for generating residuals: 1) creating residuals from scratch and 2) deriving residuals from an existing model. Detailed examples are provided below. We continue to use the ADNI dataset for demonstration.</p>
-<section id="generate-residuals-from-scratch" class="level2">
-<h2 class="anchored" data-anchor-id="generate-residuals-from-scratch">Generate Residuals from Scratch</h2>
-<p>This approach requires users to refit the regression model.</p>
+<section id="export-age-trend-table-and-gamlss-model" class="level1">
+<h1>Export Age Trend Table and GAMLSS Model</h1>
+<hr>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -363,23 +379,26 @@ R code
 <div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get harmonized dataset</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>features <span class="ot">=</span> <span class="fu">colnames</span>(adni)[<span class="fu">c</span>(<span class="dv">43</span><span class="sc">:</span><span class="dv">104</span>)]</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>covariates <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"timedays"</span>, <span class="st">"AGE"</span>, <span class="st">"SEX"</span>, <span class="st">"DIAGNOSIS"</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>interaction <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"timedays,DIAGNOSIS"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>batch <span class="ot">=</span> <span class="st">"manufac"</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>combat_model <span class="ot">=</span> <span class="fu">combat_harm</span>(<span class="at">type =</span> <span class="st">"lm"</span>, <span class="at">features =</span> features, <span class="at">batch =</span> batch, <span class="at">covariates =</span> covariates, <span class="at">interaction =</span> interaction, <span class="at">smooth =</span> <span class="cn">NULL</span>, <span class="at">random =</span> <span class="cn">NULL</span>, <span class="at">df =</span> adni)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>harmonized_df <span class="ot">=</span> combat_model<span class="sc">$</span>harmonized_df</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># generate residuals by removing timedays and DIAGNOSIS effects, while preserving AGE and SEX effects.</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>result_residual <span class="ot">=</span> <span class="fu">residual_gen</span>(<span class="at">type =</span> <span class="st">"lm"</span>, <span class="at">features =</span> features, <span class="at">covariates =</span> covariates, <span class="at">interaction =</span> interaction, <span class="at">smooth =</span> <span class="cn">NULL</span>, <span class="at">df =</span> harmonized_df, <span class="at">rm =</span> <span class="fu">c</span>(<span class="st">"timedays"</span>, <span class="st">"DIAGNOSIS"</span>))</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># save residual data set</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(result_residual<span class="sc">$</span>residual, <span class="st">"path/to/save/residual.csv"</span>)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># save regression model</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(result_residual<span class="sc">$</span>model, <span class="st">"path/to/save/regression_model.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save age trend table</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">age_save</span>(<span class="at">path =</span> <span class="st">"path/to/save"</span>, <span class="at">age_list =</span> age_list)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Save GAMLSS Model</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>gamlss_model <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(<span class="fu">length</span>(age_list)), <span class="cf">function</span>(i){</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        g_model <span class="ot">&lt;-</span> age_list[[i]]<span class="sc">$</span>model</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">return</span>(g_model)})</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(gamlss_model) <span class="ot">&lt;-</span> <span class="fu">names</span>(age_list)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(gamlss_model, <span class="at">file =</span> <span class="st">"path/to/save/gamlss_model.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 </div>
+<p>Using the command-line interface requires users to set the following parameter:</p>
+<ul>
+<li><p><code>--visualization/-v</code>: FALSE</p></li>
+<li><p><code>--outdir</code>: Path to a directory for saving the age trend table</p></li>
+<li><p><code>--mout</code>: Path to save the GAMLSS model (in .rds format)</p>
+<p>(optional if users do not wish to save the model)</p></li>
+</ul>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -393,16 +412,20 @@ CLI code
 <div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/post_CLI.R path/to/harmonized_data.csv <span class="at">-t</span> residual <span class="at">--features</span> 43-104 </span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">--covariates</span> 9,11,13-14 <span class="at">-m</span> lm <span class="at">--rm</span> 9,14 <span class="at">--outdir</span> /path/to/harmonized_data.csv <span class="at">--mout</span> /path/to/saved_model.rds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/post_CLI.R path/to/data.csv <span class="at">-f</span> 16-273 <span class="at">-A</span> 9 <span class="at">-S</span> 10 <span class="at">-I</span> 11 <span class="at">-F</span> <span class="st">"F"</span> <span class="at">-v</span> FALSE <span class="at">--outdir</span> path/to/dir <span class="at">--mout</span> path/to/save/gamlss_model.rds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="generate-residuals-from-existing-model" class="level2">
-<h2 class="anchored" data-anchor-id="generate-residuals-from-existing-model">Generate Residuals from Existing Model</h2>
-<p>This method requires users to supply a pre-trained model.</p>
+<section id="customized-residual-generation" class="level1">
+<h1>Customized Residual Generation</h1>
+<hr>
+<p><strong>ComBatFamQC</strong> offers users the flexibility to create various sets of residuals by removing the effects of specific covariates. To maximize the utility of this feature, it is important to carefully choose parameters based on the type of regression and the covariates to be adjusted for.</p>
+<p>The tool provides two methods for generating residuals: 1) creating residuals from scratch and 2) deriving residuals from an existing model. Detailed examples are provided below. We continue to use the ADNI dataset for demonstration.</p>
+<section id="generate-residuals-from-scratch" class="level2">
+<h2 class="anchored" data-anchor-id="generate-residuals-from-scratch">Generate Residuals from Scratch</h2>
+<p>This approach requires users to refit the regression model.</p>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -416,11 +439,30 @@ R code
 <div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>result_residual <span class="ot">=</span> <span class="fu">residual_gen</span>(<span class="at">type =</span> <span class="st">"lm"</span>, <span class="at">features =</span> features, <span class="at">covariates =</span> covariates, <span class="at">interaction =</span> interaction, <span class="at">smooth =</span> <span class="cn">NULL</span>, <span class="at">df =</span> harmonized_df, <span class="at">rm =</span> <span class="fu">c</span>(<span class="st">"timedays"</span>, <span class="st">"DIAGNOSIS"</span>), <span class="at">model =</span> <span class="cn">TRUE</span>, <span class="at">model_path =</span> <span class="st">"path/to/save/regression_model.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get harmonized dataset</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>features <span class="ot">&lt;-</span> <span class="fu">colnames</span>(adni)[<span class="fu">c</span>(<span class="dv">43</span><span class="sc">:</span><span class="dv">104</span>)]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>covariates <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"timedays"</span>, <span class="st">"AGE"</span>, <span class="st">"SEX"</span>, <span class="st">"DIAGNOSIS"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>interaction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"timedays,DIAGNOSIS"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>batch <span class="ot">&lt;-</span> <span class="st">"manufac"</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>combat_model <span class="ot">&lt;-</span> <span class="fu">combat_harm</span>(<span class="at">type =</span> <span class="st">"lm"</span>, <span class="at">features =</span> features, <span class="at">batch =</span> batch, <span class="at">covariates =</span> covariates, <span class="at">interaction =</span> interaction, <span class="at">smooth =</span> <span class="cn">NULL</span>, <span class="at">random =</span> <span class="cn">NULL</span>, <span class="at">df =</span> adni)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>harmonized_df <span class="ot">&lt;-</span> combat_model<span class="sc">$</span>harmonized_df</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># generate residuals by removing timedays and DIAGNOSIS effects, while preserving AGE and SEX effects.</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>result_residual <span class="ot">&lt;-</span> <span class="fu">residual_gen</span>(<span class="at">type =</span> <span class="st">"lm"</span>, <span class="at">features =</span> features, <span class="at">covariates =</span> covariates, <span class="at">interaction =</span> interaction, <span class="at">smooth =</span> <span class="cn">NULL</span>, <span class="at">df =</span> harmonized_df, <span class="at">rm =</span> <span class="fu">c</span>(<span class="st">"timedays"</span>, <span class="st">"DIAGNOSIS"</span>))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># save residual data set</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(result_residual<span class="sc">$</span>residual, <span class="st">"path/to/save/residual.csv"</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># save regression model</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(result_residual<span class="sc">$</span>model, <span class="st">"path/to/save/regression_model.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 </div>
+<p>Using the command-line interface to start the residual generation stage requires users to set the following parameter:</p>
+<ul>
+<li><p><code>--type\-t</code>: “residual”</p></li>
+<li><p><code>--outdir</code>: Path to save the harmonized dataset (in .csv format)</p></li>
+<li><p><code>--mout</code>: Path to save the regression model (in .rds format)</p>
+<p>(optional if users do not wish to save the model)</p></li>
+</ul>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -435,7 +477,52 @@ CLI code
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/post_CLI.R path/to/harmonized_data.csv <span class="at">-t</span> residual <span class="at">--features</span> 43-104 </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">--covariates</span> 9,11,13-14 <span class="at">-m</span> lm <span class="at">--rm</span> 9,14 <span class="at">--model.path</span> /path/to/saved_model.rds <span class="at">--outdir</span> /path/to/harmonized_data.csv </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">--covariates</span> 9,11,13-14 <span class="at">-m</span> lm <span class="at">--rm</span> 9,14 <span class="at">--outdir</span> /path/to/harmonized_data.csv <span class="at">--mout</span> /path/to/saved_model.rds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="generate-residuals-from-existing-model" class="level2">
+<h2 class="anchored" data-anchor-id="generate-residuals-from-existing-model">Generate Residuals from Existing Model</h2>
+<p>This method requires users to supply a pre-trained model.</p>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+R code
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>result_residual <span class="ot">&lt;-</span> <span class="fu">residual_gen</span>(<span class="at">df =</span> harmonized_df, <span class="at">rm =</span> <span class="fu">c</span>(<span class="st">"timedays"</span>, <span class="st">"DIAGNOSIS"</span>), <span class="at">model =</span> <span class="cn">TRUE</span>, <span class="at">model_path =</span> <span class="st">"path/to/save/regression_model.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<p>Using the command-line interface requires users to set the following parameter:</p>
+<ul>
+<li><code>--exist.model</code>: TRUE</li>
+<li><code>model.path</code>: Path to the saved regression model.</li>
+</ul>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+CLI code
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/post_CLI.R path/to/harmonized_data.csv <span class="at">-t</span> residual <span class="at">--exist.model</span> TRUE <span class="at">--model.path</span> /path/to/saved_model.rds <span class="at">--outdir</span> /path/to/harmonized_data.csv </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>

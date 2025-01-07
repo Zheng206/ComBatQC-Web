@@ -143,24 +143,43 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html">
+    <a class="nav-link" href="./index.html"><i class="bi bi-house-heart" role="img">
+</i> 
  <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html">
- <span class="menu-text">About</span></a>
+    <a class="nav-link" href="./about.html"><i class="bi bi-book-half" role="img">
+</i> 
+ <span class="menu-text">Start</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link active" href="./diagnostic.html" aria-current="page">
- <span class="menu-text">Batch Effect Diagnostics</span></a>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-tutorials" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-collection-play-fill" role="img">
+</i> 
+ <span class="menu-text">Tutorials</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-tutorials">    
+        <li>
+    <a class="dropdown-item" href="./diagnostic.html"><i class="bi bi-window" role="img">
+</i> 
+ <span class="dropdown-text">Batch Effect Diagnosis</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./harmonization.html">
- <span class="menu-text">Harmonization</span></a>
+        <li>
+    <a class="dropdown-item" href="./harmonization.html"><i class="bi bi-clipboard-data" role="img">
+</i> 
+ <span class="dropdown-text">Harmonization</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./post.html">
- <span class="menu-text">Post Harmonization</span></a>
+        <li>
+    <a class="dropdown-item" href="./post.html"><i class="bi bi-graph-up" role="img">
+</i> 
+ <span class="dropdown-text">Post-Harmonization Downstream Analysis</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Zheng206/ComBatFamQC"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
   </li>  
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
@@ -187,6 +206,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#diagnosis-of-individual-batch-effect" id="toc-diagnosis-of-individual-batch-effect" class="nav-link" data-scroll-target="#diagnosis-of-individual-batch-effect">Diagnosis of Individual Batch Effect</a></li>
   <li><a href="#interactive-harmonization" id="toc-interactive-harmonization" class="nav-link" data-scroll-target="#interactive-harmonization">Interactive Harmonization</a></li>
   </ul></li>
+  <li><a href="#export-batch-effect-diagnosis-result" id="toc-export-batch-effect-diagnosis-result" class="nav-link" data-scroll-target="#export-batch-effect-diagnosis-result">Export Batch Effect Diagnosis Result</a></li>
   </ul>
 </nav>
     </div>
@@ -213,6 +233,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>In this section, we will use a sample data included in this package to provide a thorough introduction to the key functionalities of the ComBatFamQC package for batch effect diagnostics.</p>
 <section id="data" class="level1">
 <h1>Data</h1>
+<hr>
 <p>The sample dataset in the package is the longitudinal cortical thickness data from the <a href="https://adni.loni.usc.edu/">Alzheimer’s Disease Neuroimaging Initiative</a> (ADNI) study (Jack et al.&nbsp;(2008)), which con- tains cortical thickness measures of 62 regions from 663 unique participants with images collected longitudinally between 2-6 visits. The processed data can be downloaded from <a href="https://github.com/ntustison/CrossLong">GitHub</a>.</p>
 <p>The key variables of interest are presented below:</p>
 <ul>
@@ -240,6 +261,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="interactive-batch-effect-diagnostics" class="level1">
 <h1>Interactive Batch Effect Diagnostics</h1>
+<hr>
 <p>Users can launch the Shiny app using the following code:</p>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
@@ -254,16 +276,26 @@ R code
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>features <span class="ot">=</span> <span class="fu">colnames</span>(adni)[<span class="fu">c</span>(<span class="dv">43</span><span class="sc">:</span><span class="dv">104</span>)]</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>covariates <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"timedays"</span>, <span class="st">"AGE"</span>, <span class="st">"SEX"</span>, <span class="st">"DIAGNOSIS"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>interaction <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"timedays,DIAGNOSIS"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>batch <span class="ot">=</span> <span class="st">"manufac"</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>result_orig <span class="ot">=</span> <span class="fu">visual_prep</span>(<span class="at">type =</span> <span class="st">"lm"</span>, <span class="at">features =</span> features, <span class="at">batch =</span> batch, <span class="at">covariates =</span> covariates, <span class="at">interaction =</span> interaction, <span class="at">smooth =</span> <span class="cn">NULL</span>, <span class="at">random =</span> <span class="cn">NULL</span>, <span class="at">df =</span> adni)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">comfam_shiny</span>(result_orig)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>features <span class="ot">&lt;-</span> <span class="fu">colnames</span>(adni)[<span class="fu">c</span>(<span class="dv">43</span><span class="sc">:</span><span class="dv">104</span>)]</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>covariates <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"timedays"</span>, <span class="st">"AGE"</span>, <span class="st">"SEX"</span>, <span class="st">"DIAGNOSIS"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>interaction <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"timedays,DIAGNOSIS"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>batch <span class="ot">&lt;-</span> <span class="st">"manufac"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>result_lmer <span class="ot">&lt;-</span> <span class="fu">visual_prep</span>(<span class="at">type =</span> <span class="st">"lmer"</span>, <span class="at">features =</span> features, <span class="at">batch =</span> batch, <span class="at">covariates =</span> covariates, <span class="at">interaction =</span> interaction, <span class="at">smooth =</span> <span class="cn">NULL</span>, <span class="at">random =</span> <span class="st">"subid"</span>, <span class="at">df =</span> adni)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">comfam_shiny</span>(result_lmer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 </div>
+<p>Alternatively, users can utilize the command-line interface via <strong>ComBatQC_CLI.R</strong>. The essential steps have been streamlined, significantly simplifying the workflow and making it easier to get started. The following parameters must be assigned values:</p>
+<ul>
+<li><code>--diagnosis/-d</code>: TRUE (by default)</li>
+<li><code>--visualization/-v</code>: TRUE (by default)</li>
+<li><code>--features/-f</code>: position of features/rois data (column numbers)</li>
+<li><code>--covariates/-c</code>: column position of the covariates whose effects should be preserved</li>
+<li><code>--batch/-b</code>: column position of the batch variable</li>
+<li><code>--smooth/-s</code>: column position of the smooth term (if a gam model is used)</li>
+<li><code>--random/-r</code>: column position of the random effect term (if a lmer model is used)</li>
+</ul>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -277,7 +309,7 @@ CLI code
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/combatQC_CLI.R path/to/unharmonized_data.csv <span class="at">-v</span> TRUE <span class="at">--features</span> 43-104 <span class="at">--covariates</span> 9,11,13-14 <span class="at">-b</span> 16 <span class="at">-i</span> 9<span class="pp">*</span>14 <span class="at">-m</span> lm </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/combatQC_CLI.R path/to/unharmonized_data.csv <span class="at">-d</span> TRUE <span class="at">-v</span> TRUE <span class="at">--features</span> 43-104 <span class="at">--covariates</span> 9,11,13-14 <span class="at">-b</span> 16 <span class="at">-i</span> 9<span class="pp">*</span>14 <span class="at">-r</span> 3 <span class="at">-m</span> lmer </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -286,7 +318,7 @@ CLI code
 <h2 class="anchored" data-anchor-id="data-overview">Data Overview</h2>
 <div id="fig-cern" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/d20G6R25b0Y" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/5OJU4oVZ6Ow" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 <p></p><figcaption class="figure-caption">Figure&nbsp;1: ComBatFamQC: Data Overview</figcaption><p></p>
 </figure>
 </div>
@@ -295,7 +327,7 @@ CLI code
 <h2 class="anchored" data-anchor-id="summary">Summary</h2>
 <div id="fig-cern" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/S9ibibL56bQ" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/cLI9WkCPLF8" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 <p></p><figcaption class="figure-caption">Figure&nbsp;2: ComBatFamQC: Summary</figcaption><p></p>
 </figure>
 </div>
@@ -304,7 +336,7 @@ CLI code
 <h2 class="anchored" data-anchor-id="residial-plot">Residial Plot</h2>
 <div id="fig-cern" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/axKWqHL1rWI" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/EME2-E3UEXI" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 <p></p><figcaption class="figure-caption">Figure&nbsp;3: ComBatFamQC: Residual Plot</figcaption><p></p>
 </figure>
 </div>
@@ -313,7 +345,7 @@ CLI code
 <h2 class="anchored" data-anchor-id="diagnosis-of-global-batch-effect">Diagnosis of Global Batch Effect</h2>
 <div id="fig-cern" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/13B-B7_ZzGo" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/-CDK0qx5_xI" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 <p></p><figcaption class="figure-caption">Figure&nbsp;4: ComBatFamQC: Diagnosis of Global Batch Effect</figcaption><p></p>
 </figure>
 </div>
@@ -322,7 +354,7 @@ CLI code
 <h2 class="anchored" data-anchor-id="diagnosis-of-individual-batch-effect">Diagnosis of Individual Batch Effect</h2>
 <div id="fig-cern" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/cPLLbMQNchs" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/UBTw3REUlSw" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 <p></p><figcaption class="figure-caption">Figure&nbsp;5: ComBatFamQC: Diagnosis of Individual Batch Effect</figcaption><p></p>
 </figure>
 </div>
@@ -331,13 +363,59 @@ CLI code
 <h2 class="anchored" data-anchor-id="interactive-harmonization">Interactive Harmonization</h2>
 <div id="fig-cern" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/g1C3bsZIqqs" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/CyAxIY9Cagk" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 <p></p><figcaption class="figure-caption">Figure&nbsp;6: ComBatFamQC: Interactive Harmonization</figcaption><p></p>
 </figure>
 </div>
-
-
 </section>
+</section>
+<section id="export-batch-effect-diagnosis-result" class="level1">
+<h1>Export Batch Effect Diagnosis Result</h1>
+<hr>
+<p>Users can save the batch effect diagnosis result using the following code:</p>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+R code
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diag_save</span>(<span class="at">path =</span> <span class="st">"path/to/dir"</span>, <span class="at">result =</span> result_lmer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<p>Using the command-line interface requires users to set the following parameter:</p>
+<ul>
+<li><code>--visualization/-v</code>: FALSE</li>
+<li><code>--outdir</code>: Path to a directory for saving the batch effect diagnosis result</li>
+</ul>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+CLI code
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/combatQC_CLI.R path/to/unharmonized_data.csv <span class="at">-d</span> TRUE <span class="at">-v</span> FALSE <span class="at">--features</span> 43-104 <span class="at">--covariates</span> 9,11,13-14 <span class="at">-b</span> 16 <span class="at">-i</span> 9<span class="pp">*</span>14 <span class="at">-r</span> 3 <span class="at">-m</span> lmer <span class="at">--outdir</span> /path/to/dir</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->

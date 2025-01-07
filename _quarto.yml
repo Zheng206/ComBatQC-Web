@@ -6,12 +6,26 @@ website:
   title: "ComBatFamQC"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
-      - diagnostic.qmd
-      - harmonization.qmd
-      - post.qmd
+      - icon: house-heart
+        text: "Home"
+        file: index.qmd
+      - icon: book-half
+        text: "Start"
+        href: about.qmd
+      - icon: collection-play-fill
+        text: "Tutorials"
+        menu:
+          - icon: window
+            text: "Batch Effect Diagnosis"
+            href: diagnostic.qmd
+          - icon: clipboard-data
+            text: "Harmonization"
+            href: harmonization.qmd
+          - icon: graph-up
+            text: "Post-Harmonization Downstream Analysis"
+            href: post.qmd
+      - icon: github
+        href: https://github.com/Zheng206/ComBatFamQC
 
 format:
   html:
