@@ -197,6 +197,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
    
   <ul>
   <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a></li>
+  <li><a href="#view-vignettes" id="toc-view-vignettes" class="nav-link" data-scroll-target="#view-vignettes">View Vignettes</a></li>
   <li><a href="#command-line-interface" id="toc-command-line-interface" class="nav-link" data-scroll-target="#command-line-interface">Command Line Interface</a></li>
   </ul>
 </nav>
@@ -221,7 +222,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<p>Beginning with unharmonized data, users can initiate an interactive batch effect diagnostic session that provides detailed qualitative visualizations and statistical test results, which help justify the need for data harmonization. The Shiny app also features an interactive harmonization session, allowing users to easily configure harmonization parameters and efficiently harmonize their data. Alternatively, users have the option to use either R or the command-line interface for for harmonizing larger datasets.</p>
+<p>Starting with unharmonized data, users can launch an interactive batch effect diagnostic session that offers detailed <strong>qualitative visualizations</strong> and <strong>statistical test results</strong> to evaluate the necessity of data harmonization. The Shiny app also includes an interactive harmonization session, enabling users to configure harmonization parameters and harmonize their data with ease. Alternatively, users can opt to perform harmonization on larger datasets using R or the command-line interface. After obtaining the harmonized dataset, users can utilize two types of post-harmonization tools for further analysis: 1) Brain ROI Age Trend Visualization and 2) Customized Residual Generation.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figure/workflow.png" class="img-fluid figure-img"></p>
@@ -230,6 +231,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <section id="installation" class="level1">
 <h1>Installation</h1>
+<hr>
 <p>Users can install the most up-to-date version of <strong>ComBatFamQC</strong> directly from github.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"devtools"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
@@ -246,11 +248,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"Zheng206/ComBatFamQC"</span>, <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>, <span class="at">force =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+<section id="view-vignettes" class="level1">
+<h1>View Vignettes</h1>
+<hr>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vignette</span>(<span class="st">"ComBatQC"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">vignette</span>(<span class="st">"Post-Harmonization"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 <section id="command-line-interface" class="level1">
 <h1>Command Line Interface</h1>
+<hr>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/CombatQC_CLI.R <span class="at">-h</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/post_CLI.R <span class="at">-h</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/CombatQC_CLI.R <span class="at">-h</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/post_CLI.R <span class="at">-h</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

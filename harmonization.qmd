@@ -5,10 +5,10 @@ format: html
 
 **ComBatFamQC** provides four types of commonly used harmonization techniques, integrated through the [ComBatFamily](https://github.com/andy1764/ComBatFamily) package developed by Dr. Andrew Chen, for users to consider. The four harmonization techniques include:
 
--   Original ComBat (Johnson et al., 2007)
--   Longitudinal ComBat (Beer et al., 2020)
--   ComBat-GAM (Pomponio et al., 2020)
--   CovBat (Chen et al., 2021)
+-   [Original ComBat (Johnson et al., 2007)](https://academic.oup.com/biostatistics/article-abstract/8/1/118/252073?redirectedFrom=fulltext&login=false)
+-   [Longitudinal ComBat (Beer et al., 2020)](https://www.sciencedirect.com/science/article/pii/S1053811920306157?via%3Dihub)
+-   [ComBat-GAM (Pomponio et al., 2020)](https://www.sciencedirect.com/science/article/pii/S1053811919310419?via%3Dihub)
+-   [CovBat (Chen et al., 2021)](https://onlinelibrary.wiley.com/doi/10.1002/hbm.25688)
 
 There are two types of harmonization scenarios users can choose from:
 

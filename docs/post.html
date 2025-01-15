@@ -266,7 +266,7 @@ R code
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>age_df[[sex]] <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(age_df[[sex]])</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># create sub_df for different features</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>sub_df_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(<span class="fu">length</span>(features)), <span class="cf">function</span>(i){</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    sub_df <span class="ot">&lt;-</span> df[,<span class="fu">c</span>(features[i], age, sex, icv)] <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>()</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    sub_df <span class="ot">&lt;-</span> age_df[,<span class="fu">c</span>(features[i], age, sex, icv)] <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>()</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">colnames</span>(sub_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(features[i], <span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"icv"</span>)</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(sub_df)</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -302,15 +302,16 @@ R code
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(age_sub)</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>}, <span class="at">mc.cores =</span> <span class="dv">1</span>) </span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(age_list) <span class="ot">&lt;-</span> features</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="do">## these two lines are important!!</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(age_list) <span class="ot">&lt;-</span> features</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>quantile_type <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">"quantile_"</span>, <span class="dv">100</span><span class="sc">*</span><span class="fl">0.25</span>), <span class="st">"median"</span>, <span class="fu">paste0</span>(<span class="st">"quantile_"</span>, <span class="dv">100</span><span class="sc">*</span><span class="fl">0.75</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 </div>
 <ul>
-<li>Start an interactive session for age trend visualization.</li>
+<li><p>Start an interactive session for age trend visualization.</p>
+<p>Users can choose to generate an interactive age trend plot using the <code>plotly</code> package or a static plot using the <code>ggplot2</code> package.</p></li>
 </ul>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
@@ -325,7 +326,11 @@ R code
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ComBatFamQC<span class="sc">::</span><span class="fu">age_shiny</span>(age_list, features, quantile_type)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Interactive Plot</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ComBatFamQC<span class="sc">::</span><span class="fu">age_shiny</span>(age_list, features, quantile_type, <span class="at">use_plotly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Static Plot</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>ComBatFamQC<span class="sc">::</span><span class="fu">age_shiny</span>(age_list, features, quantile_type, <span class="at">use_plotly =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -337,6 +342,7 @@ R code
 <li><code>--SEX/-S</code>: column position of the sex variable</li>
 <li><code>--ICV/I</code>: column position of the ICV variable</li>
 <li><code>--Female/-F</code>: female indicator, the value represent female in the sex column</li>
+<li><code>--ploty/-p</code>: whether to generate <code>plotly</code> interactive plots</li>
 </ul>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
@@ -351,15 +357,15 @@ CLI code
 <div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/post_CLI.R path/to/data.csv <span class="at">-f</span> 16-273 <span class="at">-A</span> 9 <span class="at">-S</span> 10 <span class="at">-I</span> 11 <span class="at">-F</span> <span class="st">"F"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/post_CLI.R path/to/data.csv <span class="at">-f</span> 16-273 <span class="at">-A</span> 9 <span class="at">-S</span> 10 <span class="at">-I</span> 11 <span class="at">-F</span> <span class="st">"F"</span> <span class="at">-p</span> TRUE</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="quarto-figure quarto-figure-center">
+<div id="fig-cern" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="figure/age_trend.png" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">Age Trend Visualization</figcaption><p></p>
+<div class="quarto-video ratio ratio-16x9"><iframe src="https://www.youtube.com/embed/XxYPA1j9_Xs" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1: Brain ROI Age Trend Visualization</figcaption><p></p>
 </figure>
 </div>
 </section>

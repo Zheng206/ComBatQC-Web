@@ -2,12 +2,12 @@
 title: "Introduction to ComBatFamQC"
 ---
 
-
-Beginning with unharmonized data, users can initiate an interactive batch effect diagnostic session that provides detailed qualitative visualizations and statistical test results, which help justify the need for data harmonization. The Shiny app also features an interactive harmonization session, allowing users to easily configure harmonization parameters and efficiently harmonize their data. Alternatively, users have the option to use either R or the command-line interface for for harmonizing larger datasets. 
+Starting with unharmonized data, users can launch an interactive batch effect diagnostic session that offers detailed **qualitative visualizations** and **statistical test results** to evaluate the necessity of data harmonization. The Shiny app also includes an interactive harmonization session, enabling users to configure harmonization parameters and harmonize their data with ease. Alternatively, users can opt to perform harmonization on larger datasets using R or the command-line interface. After obtaining the harmonized dataset, users can utilize two types of post-harmonization tools for further analysis: 1) Brain ROI Age Trend Visualization and 2) Customized Residual Generation.
 
 ![ComBatFamQC Workflow](figure/workflow.png)
 
 # Installation
+___
 
 Users can install the most up-to-date version of **ComBatFamQC** directly from github.
 
@@ -26,7 +26,16 @@ devtools::install_github("Zheng206/ComBatFamQC")
 devtools::install_github("Zheng206/ComBatFamQC", build_vignettes = TRUE, force = TRUE)
 ```
 
+# View Vignettes
+___
+
+```{r}
+vignette("ComBatQC")
+vignette("Post-Harmonization")
+```
+
 # Command Line Interface
+___
 
 ```{bash, eval = FALSE}
 Rscript path/to/CombatQC_CLI.R -h

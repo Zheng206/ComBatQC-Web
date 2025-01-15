@@ -372,7 +372,10 @@ CLI code
 <section id="export-batch-effect-diagnosis-result" class="level1">
 <h1>Export Batch Effect Diagnosis Result</h1>
 <hr>
-<p>Users can save the batch effect diagnosis result using the following code:</p>
+<p>Users can save the batch effect diagnosis results using the following code. There are two ways to export the results: 1) as a combined EXCEL file, or 2) as a Quarto report.</p>
+<ul>
+<li><strong>Export to a combined EXCEL file</strong></li>
+</ul>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -386,7 +389,29 @@ R code
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diag_save</span>(<span class="at">path =</span> <span class="st">"path/to/dir"</span>, <span class="at">result =</span> result_lmer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diag_save</span>(<span class="at">path =</span> <span class="st">"path/to/dir"</span>, <span class="at">result =</span> result_lmer, <span class="at">use_quarto =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>Export to a Quarto Report</strong></li>
+</ul>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+R code
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quarto)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">diag_save</span>(<span class="at">path =</span> <span class="st">"path/to/dir"</span>, <span class="at">result =</span> result_lmer, <span class="at">use_quarto =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -395,9 +420,10 @@ R code
 <ul>
 <li><code>--visualization/-v</code>: FALSE</li>
 <li><code>--outdir</code>: Path to a directory for saving the batch effect diagnosis result</li>
+<li><code>--quarto/-q</code>: Whether to generate a Quarto report.</li>
 </ul>
 <div class="callout-tip callout callout-style-default callout-captioned">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -406,10 +432,10 @@ CLI code
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/combatQC_CLI.R path/to/unharmonized_data.csv <span class="at">-d</span> TRUE <span class="at">-v</span> FALSE <span class="at">--features</span> 43-104 <span class="at">--covariates</span> 9,11,13-14 <span class="at">-b</span> 16 <span class="at">-i</span> 9<span class="pp">*</span>14 <span class="at">-r</span> 3 <span class="at">-m</span> lmer <span class="at">--outdir</span> /path/to/dir</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> path/to/combatQC_CLI.R path/to/unharmonized_data.csv <span class="at">-d</span> TRUE <span class="at">-v</span> FALSE <span class="at">--features</span> 43-104 <span class="at">--covariates</span> 9,11,13-14 <span class="at">-b</span> 16 <span class="at">-i</span> 9<span class="pp">*</span>14 <span class="at">-r</span> 3 <span class="at">-m</span> lmer <span class="at">--outdir</span> /path/to/dir <span class="at">--quarto</span> TRUE</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>

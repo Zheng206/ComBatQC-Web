@@ -33,7 +33,7 @@ icv <- "ICV_baseline"
 age_df[[sex]] <- as.factor(age_df[[sex]])
 # create sub_df for different features
 sub_df_list <- lapply(seq_len(length(features)), function(i){
-    sub_df <- df[,c(features[i], age, sex, icv)] %>% na.omit()
+    sub_df <- age_df[,c(features[i], age, sex, icv)] %>% na.omit()
     colnames(sub_df) <- c(features[i], "age", "sex", "icv")
     return(sub_df)
   })
@@ -57,18 +57,24 @@ age_list <- mclapply(1:length(features), function(w){
   return(age_sub)
 }, mc.cores = 1) 
 
+## these two lines are important!!
 names(age_list) <- features
-
 quantile_type <- c(paste0("quantile_", 100*0.25), "median", paste0("quantile_", 100*0.75))
 ```
 :::
 
--   Start an interactive session for age trend visualization.
+-   Start an interactive session for age trend visualization. 
+
+    Users can choose to generate an interactive age trend plot using the `plotly` package or a static plot using the `ggplot2` package.
 
 ::: {.callout-note collapse="true"}
 ## R code
 ```{r}
-ComBatFamQC::age_shiny(age_list, features, quantile_type)
+# Interactive Plot
+library(plotly)
+ComBatFamQC::age_shiny(age_list, features, quantile_type, use_plotly = TRUE)
+# Static Plot
+ComBatFamQC::age_shiny(age_list, features, quantile_type, use_plotly = FALSE)
 ```
 :::
 
@@ -79,15 +85,22 @@ Alternatively, users can utilize the command-line interface via **post_CLI.R**. 
 -   `--SEX/-S`: column position of the sex variable
 -   `--ICV/I`:  column position of the ICV variable
 -   `--Female/-F`: female indicator, the value represent female in the sex column
+-   `--ploty/-p`: whether to generate `plotly` interactive plots
 
 ::: {.callout-tip collapse="true"}
 ## CLI code
 ```{bash, eval = FALSE}
-Rscript path/to/post_CLI.R path/to/data.csv -f 16-273 -A 9 -S 10 -I 11 -F "F"
+Rscript path/to/post_CLI.R path/to/data.csv -f 16-273 -A 9 -S 10 -I 11 -F "F" -p TRUE
 ```
 :::
 
-![Age Trend Visualization](figure/age_trend.png)
+::: {#fig-cern}
+
+{{< video https://youtu.be/XxYPA1j9_Xs >}}
+
+Brain ROI Age Trend Visualization
+
+:::
 
 # Export Age Trend Table and GAMLSS Model
 ___

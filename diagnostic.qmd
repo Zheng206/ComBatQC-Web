@@ -129,12 +129,24 @@ ComBatFamQC: Interactive Harmonization
 # Export Batch Effect Diagnosis Result
 ___
 
-Users can save the batch effect diagnosis result using the following code:
+Users can save the batch effect diagnosis results using the following code. There are two ways to export the results: 1) as a combined EXCEL file, or 2) as a Quarto report.
+
+-   **Export to a combined EXCEL file**
 
 ::: {.callout-note collapse="true"}
 ## R code
 ```{r}
-diag_save(path = "path/to/dir", result = result_lmer)
+diag_save(path = "path/to/dir", result = result_lmer, use_quarto = FALSE)
+```
+:::
+
+-   **Export to a Quarto Report**
+
+::: {.callout-note collapse="true"}
+## R code
+```{r}
+library(quarto)
+diag_save(path = "path/to/dir", result = result_lmer, use_quarto = TRUE)
 ```
 :::
 
@@ -142,10 +154,11 @@ Using the command-line interface requires users to set the following parameter:
 
 -   `--visualization/-v`: FALSE
 -   `--outdir`: Path to a directory for saving the batch effect diagnosis result
+-   `--quarto/-q`: Whether to generate a Quarto report.
 
 ::: {.callout-tip collapse="true"}
 ## CLI code
 ```{bash, eval = FALSE}
-Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -d TRUE -v FALSE --features 43-104 --covariates 9,11,13-14 -b 16 -i 9*14 -r 3 -m lmer --outdir /path/to/dir
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -d TRUE -v FALSE --features 43-104 --covariates 9,11,13-14 -b 16 -i 9*14 -r 3 -m lmer --outdir /path/to/dir --quarto TRUE
 ```
 :::

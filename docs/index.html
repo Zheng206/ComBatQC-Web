@@ -152,7 +152,7 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 <p>The ComBatFamQC package is an innovative solution designed to enhance the process of <span style="color:coral;">batch effect diagnostics</span>, <span style="color:yellowgreen;">harmonization</span>, and <span style="color:cornflowerblue;">post-harmonization downstream analysis</span>.</p>
-<p>By providing interactive qualitative visualization alongside rigorous statistical testing, this package empowers users to effectively identify potential batch effects in their data. Beyond, ComBatFamQC includes a range of built-in harmonization techniques that simplify the harmonization process, ensuring that researchers can achieve optimal results without the need for extensive technical expertise. Additionally, ComBatFamQC allows the creation of interactive lifes-pan age trend plots of individual brain features with estimated age-adjusted centiles. It also includes functions to easily generate covariate-corrected residuals that could be used as inputs for downstream machine learning models.</p>
+<p>By providing interactive qualitative visualization alongside rigorous statistical testing, this package empowers users to effectively identify potential batch effects in their data. Additionally, ComBatFamQC includes a suite of built-in harmonization techniques that streamline the harmonization process, allowing researchers to achieve optimal results without requiring extensive technical expertise. The four harmonization techniques supported are: 1) <strong>Original ComBat</strong>, 2) <strong>Longitudinal ComBat</strong>, 3) <strong>ComBat-GAM</strong>, and 4) <strong>CovBat</strong>. Furthermore, ComBatFamQC allows users to create interactive life-span age trend plots of individual brain features with estimated age-adjusted centiles. The package also provides functions to generate covariate-corrected residuals, which can be used as inputs for downstream machine learning models.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figure/ComBatFamQC.png" class="img-fluid figure-img"></p>
@@ -160,7 +160,7 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 <p>The package leverages the capabilities of <strong>R Shiny</strong> to offer interactive visualizations for both batch effect diagnostics and age trend analysis, presenting data in an accessible format that enhances interpretability.</p>
-<p>To cater to a diverse user base, ComBatFamQC includes two user-friendly command-line interfaces that guide users through different stages of the processing pipeline:</p>
+<p>To cater to a diverse user base, ComBatFamQC includes two user-friendly command-line interfaces (located in the <code>inst/</code> directory) that guide users through different stages of the processing pipeline:</p>
 <ul>
 <li><p>The <strong>CombatQC_CLI.R</strong> script focuses on the batch effect diagnostics and harmonization stage, providing interactive tools to diagnose and adjust for batch effects effectively.</p></li>
 <li><p>The <strong>post_CLI.R</strong> script is dedicated to the post-harmonization stage, where users can visualize age trends across various brain structures and generate a residual dataset that excludes the effects of unwanted covariates.</p></li>
