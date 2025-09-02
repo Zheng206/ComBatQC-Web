@@ -17,3 +17,16 @@ To cater to a diverse user base, ComBatFamQC includes two user-friendly command-
 -   The **post_CLI.R** script is dedicated to the post-harmonization stage, where users can visualize age trends across various brain structures and generate a residual dataset that excludes the effects of unwanted covariates. 
 
 Together, these components make ComBatFamQC a comprehensive and accessible tool for researchers working with complex datasets in neuroimaging and other related fields.
+
+To conveniently access the two command-line scripts, use the following code:
+
+::: {.callout-note}
+## Quic Access to CLI 
+```{bash}
+RSCRIPT=${RSCRIPT:-$(command -v Rscript)}
+combatqc_cli="$($RSCRIPT -e 'cat(system.file("combatQC_CLI.R", package="ComBatFamQC"))')"
+post_cli="$($RSCRIPT -e 'cat(system.file("post_CLI.R", package="ComBatFamQC"))')"
+Rscript $combatqc_cli -h
+Rscript $post_cli -h
+```
+:::
