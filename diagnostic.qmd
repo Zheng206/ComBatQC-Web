@@ -1,0 +1,245 @@
+---
+title: "Batch Effect Diagnostics"
+format: html
+---
+
+```{=html}
+<!-- Right-side fixed toggle -->
+<div class="mode-toggle" role="group" aria-label="Select mode">
+  <div class="btn-group">
+    <button id="btn-r" class="btn btn-primary" type="button">R Code</button>
+    <button id="btn-cli" class="btn btn-outline-primary" type="button">CLI</button>
+  </div>
+</div>
+```
+
+In this section, we will use a sample data included in this package to provide a thorough introduction to the key functionalities of the **[ComBatFamQC]{style="color:#C83F49"}** package for batch effect diagnostics.
+
+# Data
+___
+
+The sample dataset in the package is the longitudinal cortical thickness data from the
+[Alzheimer’s Disease Neuroimaging Initiative](https://adni.loni.usc.edu/
+) (ADNI) study (Jack et al. (2008)), which con-
+tains cortical thickness measures of 62 regions from 663 unique participants with images
+collected longitudinally between 2-6 visits. The processed data can be downloaded from [GitHub](
+https://github.com/ntustison/CrossLong). 
+
+The key variables of interest are presented below:
+
+-   Batch variable: 
+    -   <span style="color:blueviolet;">*manufac*</span>: MRI manufacturer
+-   Covariates
+    -   <span style="color:darkseagreen;">*timedays*</span>: time related variable
+    -   <span style="color:darkseagreen;">*Age*</span>
+    -   <span style="color:darkseagreen;">*SEX*</span> 
+    -   <span style="color:darkseagreen;">*DIAGNOSIS*</span>: (AD, CN, LMCI)
+    
+    (We consider an interaction effect between *timedays* and *DIAGNOSIS*)
+-   Features to harmonize
+    -   62 <span style="color:coral;">cortical thickness</span> regions
+-   Random Effect
+    -   <span style="color:cornflowerblue;">*subid*</span> : Subject IDs.
+
+# Interactive Batch Effect Diagnostics
+___
+
+The diagnostic workflow is the same whether you use R or the CLI:
+
+1. **Set up variables**:
+Select features, batch, covariates, interactions, and random effects.
+
+2. **Fit the diagnostic model**:
+A linear mixed-effects model (`lmer`) evaluates batch effects while accounting for repeated measures.
+
+3. **View diagnostics**:
+Inspect plots showing batch trends, covariate effects, and distribution differences.
+
+4. **Interpret results**:
+Use the summaries and visualizations to determine whether harmonization is needed.
+
+You can run this workflow through R  or through the CLI.
+Expand the panels below to see the corresponding code.
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Model Fitting & Diagnostics
+The R interface prepares the data, fits the models, and launches an interactive Shiny app for diagnostics using `visual_prep()`and `comfam_shiny()`.
+```{r}
+#| class: highlight-chunk
+features <- colnames(adni)[c(43:104)]
+covariates <- c("timedays", "AGE", "SEX", "DIAGNOSIS")
+interaction <- c("timedays,DIAGNOSIS")
+batch <- "manufac"
+result_lmer <- visual_prep(
+  type = "lmer",
+  features = features,
+  batch = batch,
+  covariates = covariates,
+  interaction = interaction,
+  smooth = NULL,
+  random = "subid",
+  df = adni
+)
+comfam_shiny(result_lmer)
+```
+What this does (summary):
+
+- Selects columns <span style="color:coral;">43–104</span>  as features (62 cortical thickness regions).
+
+- Uses <span style="color:blueviolet;">manufac</span>  as the batch variable.
+
+- Includes <span style="color:darkseagreen;">timedays</span> , <span style="color:darkseagreen;">AGE</span> , <span style="color:darkseagreen;">SEX</span> , and <span style="color:darkseagreen;">DIAGNOSIS</span> , plus the <span style="color:darkseagreen;">timedays × DIAGNOSIS</span>  interaction.
+
+- Treats <span style="color:cornflowerblue;">subid</span>  as a random effect for subject-level correlation.
+
+- Launches a Shiny app to explore diagnostic plots interactively.
+:::
+If you prefer **CLI**, you can run the same workflow directly from the terminal.
+This approach is especially convenient for automation, scripting, or large-scale batch runs.
+
+
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: Model Fitting & Diagnostics
+The CLI interface mirrors the R workflow but is designed for scripting and batch runs.
+```{bash, eval = FALSE}
+#| class: highlight-chunk
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv \
+  -d TRUE -v TRUE \
+  --features 43-104 \
+  --covariates 9,11,13-14 \
+  -b 16 -i 9*14 -r 3 -m lmer
+```
+Main options overview:
+
+- `--diagnosis/-d`: whether to include diagnosis effects (default `TRUE`)  
+- `--visualization/-v`: whether to generate diagnostic visuals (default `TRUE`)  
+- `--features/-f`: feature columns (e.g., 43–104)  
+- `--covariates/-c`: covariate columns  
+- `--batch/-b`: batch column  
+- `--smooth/-s`: smooth term column (for `gam`)  
+- `--random/-r`: random-effect column (for `lmer`)
+:::
+
+After running either workflow, **[ComBatFamQC]{style="color:#C83F49"}** will produce diagnostic plots and summaries that help you visually and quantitatively assess batch effects before harmonization.
+
+# Exporting Results
+___
+
+Once diagnostics are complete, you may want to:
+
+- Save tabular summaries (e.g., per-feature statistics, model summaries), or
+
+- Produce a standalone report that documents the diagnostic analysis.
+
+ComBatFamQC supports both use cases via R functions and CLI options.
+
+### Export from R
+
+You can export results either as an [Excel file]{style="color:#8D38C9"} or a [Quarto report]{style="color:#8D38C9"}.
+Both options use the same underlying diagnostics object produced in the previous step
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Excel Report
+```{r}
+diag_save(path = "path/to/dir", result = result_lmer, use_quarto = FALSE)
+```
+:::
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Quarto Report
+```{r}
+library(quarto)
+diag_save(path = "path/to/dir", result = result_lmer, use_quarto = TRUE)
+```
+:::
+
+### Export from CLI
+
+From the command line, you can run diagnostics and export results in a single step or perform diagnostics first and export later. The CLI supports both Excel-style outputs and Quarto report generation.
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: Export Diagnostics
+```{bash, eval = FALSE}
+#| class: highlight-chunk
+Rscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv \
+  -d TRUE -v FALSE \
+  --features 43-104 \
+  --covariates 9,11,13-14 \
+  -b 16 -i 9*14 -r 3 -m lmer \
+  --outdir /path/to/dir\
+  --quarto TRUE
+```
+Main options overview:
+
+- `--visualization/-v`: set to `FALSE` when exporting only  
+- `--outdir`: directory for outputs  
+- `--quarto/-q`: whether to generate a Quarto report
+:::
+
+```{=html}
+<style>
+.mode-toggle {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--quarto-body-bg, #fff);
+  padding: .5rem 0;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+.hidden-by-toggle { display: none !important; }
+</style>
+
+<script>
+(function(){
+  const btnR = document.getElementById('btn-r');
+  const btnCli = document.getElementById('btn-cli');
+
+  // Restore preferences from localStorage
+  let showR = true;
+  let showCli = false;
+
+  try {
+    const saved = JSON.parse(localStorage.getItem('preferredModes'));
+    if (saved) {
+      showR = saved.showR ?? true;
+      showCli = saved.showCli ?? false;
+    }
+  } catch(e){}
+
+  function updateVisibility() {
+    const rEls = document.querySelectorAll('.r-only');
+    const cliEls = document.querySelectorAll('.cli-only');
+
+    rEls.forEach(el => el.classList.toggle('hidden-by-toggle', !showR));
+    cliEls.forEach(el => el.classList.toggle('hidden-by-toggle', !showCli));
+
+    // Button styles
+    btnR.classList.toggle('btn-primary', showR);
+    btnR.classList.toggle('btn-outline-primary', !showR);
+    btnCli.classList.toggle('btn-primary', showCli);
+    btnCli.classList.toggle('btn-outline-primary', !showCli);
+
+    // Save preferences
+    try {
+      localStorage.setItem('preferredModes', JSON.stringify({showR, showCli}));
+    } catch(e){}
+  }
+
+  btnR.addEventListener('click', ()=>{
+    showR = !showR;
+    updateVisibility();
+  });
+
+  btnCli.addEventListener('click', ()=>{
+    showCli = !showCli;
+    updateVisibility();
+  });
+
+  updateVisibility();
+})();
+</script>
+
+
+# Learn More
+- Check out the [**Example: Harmonization**](harmonization.qmd) for a hands-on look at how to apply harmonization methods effectively.

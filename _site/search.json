@@ -1,0 +1,114 @@
+[
+  {
+    "objectID": "diagnostic.html",
+    "href": "diagnostic.html",
+    "title": "Batch Effect Diagnostics",
+    "section": "",
+    "text": "In this section, we will use a sample data included in this package to provide a thorough introduction to the key functionalities of the ComBatFamQC package for batch effect diagnostics."
+  },
+  {
+    "objectID": "diagnostic.html#data-overview",
+    "href": "diagnostic.html#data-overview",
+    "title": "Batch Effect Diagnostics",
+    "section": "Data Overview",
+    "text": "Data Overview\n\n\n\nFigure 1: ComBatFamQC: Data Overview"
+  },
+  {
+    "objectID": "diagnostic.html#summary",
+    "href": "diagnostic.html#summary",
+    "title": "Batch Effect Diagnostics",
+    "section": "Summary",
+    "text": "Summary\n\n\n\nFigure 2: ComBatFamQC: Summary"
+  },
+  {
+    "objectID": "diagnostic.html#residial-plot",
+    "href": "diagnostic.html#residial-plot",
+    "title": "Batch Effect Diagnostics",
+    "section": "Residial Plot",
+    "text": "Residial Plot\n\n\n\nFigure 3: ComBatFamQC: Residual Plot"
+  },
+  {
+    "objectID": "diagnostic.html#diagnosis-of-global-batch-effect",
+    "href": "diagnostic.html#diagnosis-of-global-batch-effect",
+    "title": "Batch Effect Diagnostics",
+    "section": "Diagnosis of Global Batch Effect",
+    "text": "Diagnosis of Global Batch Effect\n\n\n\nFigure 4: ComBatFamQC: Diagnosis of Global Batch Effect"
+  },
+  {
+    "objectID": "diagnostic.html#diagnosis-of-individual-batch-effect",
+    "href": "diagnostic.html#diagnosis-of-individual-batch-effect",
+    "title": "Batch Effect Diagnostics",
+    "section": "Diagnosis of Individual Batch Effect",
+    "text": "Diagnosis of Individual Batch Effect\n\n\n\nFigure 5: ComBatFamQC: Diagnosis of Individual Batch Effect"
+  },
+  {
+    "objectID": "diagnostic.html#interactive-harmonization",
+    "href": "diagnostic.html#interactive-harmonization",
+    "title": "Batch Effect Diagnostics",
+    "section": "Interactive Harmonization",
+    "text": "Interactive Harmonization\n\n\n\nFigure 6: ComBatFamQC: Interactive Harmonization"
+  },
+  {
+    "objectID": "harmonization.html",
+    "href": "harmonization.html",
+    "title": "Harmonization",
+    "section": "",
+    "text": "ComBatFamQC provides four types of commonly used harmonization techniques, integrated through the ComBatFamily package developed by Dr. Andrew Chen, for users to consider. The four harmonization techniques include:\nThere are two types of harmonization scenarios users can choose from:"
+  },
+  {
+    "objectID": "harmonization.html#original-combat",
+    "href": "harmonization.html#original-combat",
+    "title": "Harmonization",
+    "section": "Original ComBat",
+    "text": "Original ComBat\nA method designed for batch effect correction in cross-sectional data with linear covariate effects.\n\n\n\n\n\n\nR code\n\n\n\n\n\n\nfeatures = colnames(adni)[c(43:104)]\ncovariates = c(\"timedays\", \"AGE\", \"SEX\", \"DIAGNOSIS\")\ninteraction = c(\"timedays,DIAGNOSIS\")\nbatch = \"manufac\"\ncombat_model = combat_harm(type = \"lm\", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = NULL, df = adni)\nhead(combat_model$harmonized_df)\n\n\n\n\n\n\n\n\n\n\nCLI code\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --features 43-104 \n--covariates 9,11,13-14 -b 16 -i 9*14 -m lm --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "harmonization.html#longitudinal-combat",
+    "href": "harmonization.html#longitudinal-combat",
+    "title": "Harmonization",
+    "section": "Longitudinal ComBat",
+    "text": "Longitudinal ComBat\nA method accounts for intra-subject correlation in longitudinal data by incorporating random effects into the model.\n\n\n\n\n\n\nR code\n\n\n\n\n\n\ncombat_model_lmer = combat_harm(type = \"lmer\", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = \"subid\", df = adni)\nhead(combat_model_lmer$harmonized_df)\n\n\n\n\n\n\n\n\n\n\nCLI code\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --features 43-104 \n--covariates 9,11,13-14 -b 16 -i 9*14 -m lmer -r 3 --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "harmonization.html#combat-gam",
+    "href": "harmonization.html#combat-gam",
+    "title": "Harmonization",
+    "section": "ComBat-GAM",
+    "text": "ComBat-GAM\nA method allows for preservation of non-linear covariate effects through use of the generalized additive model.\n\n\n\n\n\n\nR code\n\n\n\n\n\n\ncombat_model_gam = combat_harm(type = \"gam\", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = \"AGE\", smooth_int_type = \"linear\", df = adni)\nhead(combat_model_gam$harmonized_df)\n\n\n\n\n\n\n\n\n\n\nCLI code\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --features 43-104 \n--covariates 9,11,13-14 -b 16 -i 9*14 -m gam -s 11 --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "harmonization.html#covbat",
+    "href": "harmonization.html#covbat",
+    "title": "Harmonization",
+    "section": "CovBat",
+    "text": "CovBat\nCovBat is used for correcting covariance batch effects.\n\n\n\n\n\n\nR code\n\n\n\n\n\n\ncovbat_model = combat_harm(type = \"gam\", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth_int_type = \"linear\", smooth = \"AGE\", df = adni, family = \"covfam\")\nhead(covbat_model$harmonized_df)\n\n\n\n\n\n\n\n\n\n\nCLI code\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --features 43-104 \n--covariates 9,11,13-14 -b 16 -i 9*14 -m gam -s 11 -f covfam --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "harmonization.html#from-combat-model",
+    "href": "harmonization.html#from-combat-model",
+    "title": "Harmonization",
+    "section": "from ComBat Model",
+    "text": "from ComBat Model\nSpecify predict parameter to be TRUE and object parameter to be saved ComBat model.\n\n\n\n\n\n\nR code\n\n\n\n\n\n\nsaved_model = combat_model_gam$combat.object\nharm_predict = combat_harm(df = adni %>% head(1000), predict = TRUE, object = saved_model)\n\n\n\n\n\n\n\n\n\n\nCLI code\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --predict TRUE -o path/to/saved_model.rds --outdir /path/to/harmonized_data.csv"
+  },
+  {
+    "objectID": "harmonization.html#from-reference-data",
+    "href": "harmonization.html#from-reference-data",
+    "title": "Harmonization",
+    "section": "from Reference Data",
+    "text": "from Reference Data\nSpecify reference parameter to be saved reference data. To be noticed, the reference data should have identical columns as the new data and the new data should contain reference data as its sub sample.\n\n\n\n\n\n\nR code\n\n\n\n\n\n\n# harmonize reference data\nreference_site = adni %>% group_by(site) %>% summarize(count = n()) %>% arrange(desc(count)) %>% pull(site) %>% head(30)\nreference_df = adni %>% filter(site %in% reference_site)\nfeatures = colnames(reference_df)[c(43:104)]\ncovariates = c(\"timedays\", \"AGE\", \"SEX\", \"DIAGNOSIS\")\ninteraction = c(\"timedays,DIAGNOSIS\")\nbatch = \"site\"\nref_model = combat_harm(type = \"lmer\", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = \"subid\", df = reference_df)\n\n# harmonize new data to the reference data\nharm_new = combat_harm(type = \"lmer\", features = features, batch = batch, covariates = covariates, interaction = interaction, smooth = NULL, random = \"subid\", df = adni, reference = ref_model$harmonized_df)\n\n\n\n\n\n\n\n\n\n\nCLI code\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv -v FALSE --features 43-104 --covariates 9,11,13-14 -b 16 -i 9*14 -m lmer -r 3 --reference path/to/reference.csv --outdir /path/to/harmonized_data.csv --mout /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ComBatFamQC",
+    "section": "",
+    "text": "The ComBatFamQC package is an innovative solution designed to enhance the process of batch effect diagnostics, harmonization, and post-harmonization downstream analysis.\nBy providing interactive qualitative visualization alongside rigorous statistical testing, this package empowers users to effectively identify potential batch effects in their data. Beyond, ComBatFamQC includes a range of built-in harmonization techniques that simplify the harmonization process, ensuring that researchers can achieve optimal results without the need for extensive technical expertise. Additionally, ComBatFamQC allows the creation of interactive lifes-pan age trend plots of individual brain features with estimated age-adjusted centiles. It also includes functions to easily generate covariate-corrected residuals that could be used as inputs for downstream machine learning models.\n\n\n\nComBatFamQC Diagram\n\n\nThe package leverages the capabilities of R Shiny to offer interactive visualizations for both batch effect diagnostics and age trend analysis, presenting data in an accessible format that enhances interpretability.\nTo cater to a diverse user base, ComBatFamQC includes two user-friendly command-line interfaces that guide users through different stages of the processing pipeline:\n\nThe CombatQC_CLI.R script focuses on the batch effect diagnostics and harmonization stage, providing interactive tools to diagnose and adjust for batch effects effectively.\nThe post_CLI.R script is dedicated to the post-harmonization stage, where users can visualize age trends across various brain structures and generate a residual dataset that excludes the effects of unwanted covariates.\n\nTogether, these components make ComBatFamQC a comprehensive and accessible tool for researchers working with complex datasets in neuroimaging and other related fields."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Introduction\nBeginning with unharmonized data, users can initiate an interactive batch effect diagnostic session that provides detailed qualitative visualizations and statistical test results, which help justify the need for data harmonization. The Shiny app also features an interactive harmonization session, allowing users to easily configure harmonization parameters and efficiently harmonize their data. Alternatively, users have the option to use either R or the command-line interface for for harmonizing larger datasets.\n\n\n\nComBatFamQC Workflow\n\n\n\n\nInstallation\nUsers can install the most up-to-date version of ComBatFamQC directly from github.\n\nif (!require(\"devtools\", quietly = TRUE)) {\n    install.packages(\"devtools\")   \n}\nlibrary(devtools)\ndevtools::install_github(\"Zheng206/ComBatFamQC\", build_vignettes = TRUE)\n\n\n\nCommand Line Interface\n\nRscript path/to/CombatQC_CLI.R -h\nRscript path/to/post_CLI.R -h"
+  }
+]

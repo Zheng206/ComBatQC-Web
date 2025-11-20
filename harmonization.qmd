@@ -1,0 +1,420 @@
+---
+title: "Harmonization"
+format: html
+---
+```{=html}
+<!-- Right-side fixed toggle -->
+<div class="mode-toggle" role="group" aria-label="Select mode">
+  <div class="btn-group">
+    <button id="btn-r" class="btn btn-primary" type="button">R Code</button>
+    <button id="btn-cli" class="btn btn-outline-primary" type="button">CLI</button>
+  </div>
+</div>
+```
+
+**[ComBatFamQC]{style="color:#C83F49"}** provides four types of commonly used harmonization techniques, integrated through the [ComBatFamily](https://github.com/andy1764/ComBatFamily) package developed by Dr. Andrew Chen, for users to consider. The four harmonization techniques include:
+
+-   [ComBat (Johnson et al., 2007)](https://academic.oup.com/biostatistics/article-abstract/8/1/118/252073?redirectedFrom=fulltext&login=false)
+-   [Longitudinal ComBat (Beer et al., 2020)](https://doi.org/10.1016/j.neuroimage.2020.117129)
+-   [ComBat-GAM (Pomponio et al., 2020)](https://pmc.ncbi.nlm.nih.gov/articles/PMC6980790/)
+-   [CovBat (Chen et al., 2021)](https://onlinelibrary.wiley.com/doi/10.1002/hbm.25688)
+
+There are two types of harmonization scenarios users can choose from:
+
+-   **First-time Harmonization** (Can also do interactive harmonization through Rshiny)
+-   **Out of Sample Harmonization**
+    -   predict from existing ComBat model (currently not supports [Longitudinal ComBat]{style="color:blueviolet"})
+    -   harmonize new data toward existing reference data (works for all built-in ComBat harmonization methods)
+
+# First Time Harmonization
+___
+
+In order to run harmonization, you need to specify your harmonization parameters based on the method you plan to use.
+
+In R, harmonization is performed with the `combat_harm()` function, where you provide the features, batch variable, covariates, interaction terms, and optional smooth or random effects depending on the selected ComBat method
+
+Users can also use the command-line interface via **ComBatQC_CLI.R** to start the harmonization stage. Apart from the same required parameters as the diagnosis stage(`features`, `covariates`, `batch`, `smooth`, `random`), using the command-line interface also requires users to set the following parameter:
+
+-   `--diagnosis/-d`: `FALSE`
+-   `--outdir`: Path to save the harmonized dataset (in .csv format)
+-   `--mout`: Path to save the ComBat model (optional if users do not wish to save the model; in .rds format)
+
+## ComBat
+
+A method designed for batch effect correction in [cross-sectional]{style="color:#E56E94"} data with linear covariate effects.
+
+::: {.callout-note .r-only collapse="true"}
+## R code: ComBat
+```{r}
+features <- colnames(adni)[c(43:104)]
+covariates <- c("timedays", "AGE", "SEX", "DIAGNOSIS")
+interaction <- c("timedays,DIAGNOSIS")
+batch <- "manufac"
+combat_model <- combat_harm(
+  type        = "lm",
+  features    = features,
+  batch       = batch,
+  covariates  = covariates,
+  interaction = interaction,
+  smooth      = NULL,
+  random      = NULL,
+  df          = adni
+)
+head(combat_model$harmonized_df)
+
+```
+:::
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: ComBat
+```{bash, eval = FALSE}
+Rscript path/to/combatQC_CLI.R \
+  path/to/unharmonized_data.csv \
+  -d FALSE \
+  --features 43-104 \
+  --covariates 9,11,13-14 \
+  -b 16 \
+  -i 9*14 \
+  -m lm \
+  --outdir /path/to/harmonized_data.csv \
+  --mout  /path/to/saved_model.rds
+```
+:::
+
+## Longitudinal ComBat
+
+A method accounts for intra-subject correlation in [longitudinal data]{style="color:#E56E94"} by incorporating random effects into the model.
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Longitudinal ComBat
+```{r}
+combat_model_lmer <- combat_harm(
+  type        = "lmer",
+  features    = features,
+  batch       = batch,
+  covariates  = covariates,
+  interaction = interaction,
+  smooth      = NULL,
+  random      = "subid",
+  df          = adni
+)
+
+head(combat_model_lmer$harmonized_df)
+
+```
+:::
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: Longitudinal ComBat
+```{bash, eval = FALSE}
+Rscript path/to/combatQC_CLI.R \
+  path/to/unharmonized_data.csv \
+  -d FALSE \
+  --features 43-104 \
+  --covariates 9,11,13-14 \
+  -b 16 \
+  -i 9*14 \
+  -m lmer \
+  -r 3 \
+  --outdir /path/to/harmonized_data.csv \
+  --mout  /path/to/saved_model.rds
+```
+:::
+
+
+## ComBat-GAM
+
+A method allows for preservation of [non-linear covariate effects]{style="color:#E56E94"} through use of the generalized additive model.
+
+::: {.callout-note .r-only collapse="true"}
+## R code: ComBat-GAM
+```{r}
+combat_model_gam <- combat_harm(
+  type            = "gam",
+  features        = features,
+  batch           = batch,
+  covariates      = covariates,
+  interaction     = interaction,
+  smooth          = "AGE",
+  smooth_int_type = "linear",
+  df              = adni
+)
+
+head(combat_model_gam$harmonized_df)
+```
+:::
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: ComBat-GAM
+```{bash, eval = FALSE}
+Rscript path/to/combatQC_CLI.R \
+  path/to/unharmonized_data.csv \
+  -d FALSE \
+  --features 43-104 \
+  --covariates 9,11,13-14 \
+  -b 16 \
+  -i 9*14 \
+  -m gam \
+  -s 11 \
+  --outdir /path/to/harmonized_data.csv \
+  --mout  /path/to/saved_model.rds
+```
+:::
+
+## CovBat
+
+CovBat is used for correcting [covariance batch effects]{style="color:#E56E94"}.
+
+::: {.callout-note .r-only collapse="true"}
+## R code: CovBat
+```{r}
+covbat_model <- combat_harm(
+  type            = "gam",
+  features        = features,
+  batch           = batch,
+  covariates      = covariates,
+  interaction     = interaction,
+  smooth          = "AGE",
+  smooth_int_type = "linear",
+  df              = adni,
+  family          = "covfam"
+)
+
+head(covbat_model$harmonized_df)
+
+```
+:::
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: CovBat
+```{bash, eval = FALSE}
+Rscript path/to/combatQC_CLI.R \
+  path/to/unharmonized_data.csv \
+  -d FALSE \
+  --features 43-104 \
+  --covariates 9,11,13-14 \
+  -b 16 \
+  -i 9*14 \
+  -m gam \
+  -s 11 \
+  -f covfam \
+  --outdir /path/to/harmonized_data.csv \
+  --mout  /path/to/saved_model.rds
+```
+:::
+
+# Out-of-Sample Harmonization
+___
+
+## from ComBat Model
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Out-of-sample ComBat
+Specify `predict` parameter to be `TRUE` and `object` parameter to be saved ComBat model.
+```{r}
+#| class: highlight-chunk
+saved_model <- combat_model_gam$combat.object
+
+harm_predict <- combat_harm(
+  df      = adni %>% head(1000),
+  predict = TRUE,
+  object  = saved_model
+)
+```
+:::
+
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: Out-of-sample ComBat
+Using the command-line interface requires users to set the following parameter:
+
+-   `--predict`: `TRUE`
+-   `--object/-o`: Path to the saved ComBat model (in .rds format)
+```{bash, eval = FALSE}
+#| class: highlight-chunk
+Rscript path/to/combatQC_CLI.R \
+  path/to/unharmonized_data.csv \
+  -d FALSE \
+  --predict TRUE \
+  -o path/to/saved_model.rds \
+  --outdir /path/to/harmonized_data.csv
+```
+:::
+
+## from CovBat Model
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Out-of-sample CovBat
+Specify `predict` parameter to be `TRUE` and `object` parameter to be saved CovBat model.
+```{r}
+#| class: highlight-chunk
+saved_model <- covbat_model$combat.object
+
+harm_predict <- combat_harm(
+  df      = adni,
+  predict = TRUE,
+  object  = saved_model
+)
+```
+:::
+
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: Out-of-Sample CovBat
+Using the command-line interface requires users to set the following parameter:
+
+-   `-d`/`--diagnosis`: set to `FALSE` to run harmonization (use `TRUE` to run batch effect diagnostics only)
+-   `--predict`: set to `TRUE` for out-of-sample harmonization using a saved covbat model
+-   `--object/-o`: Path to the saved CovBat model file (.rds)
+-   `--outdir`: Path to write the harmonized data (.csv)
+```{bash, eval = FALSE}
+#| class: highlight-chunk
+Rscript path/to/combatQC_CLI.R \
+  path/to/unharmonized_data.csv \
+  -d FALSE \
+  --predict TRUE \
+  -o path/to/saved_model.rds \
+  --outdir /path/to/harmonized_data.csv
+```
+:::
+
+## from Reference Data
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Out-of-sample using Reference Data
+Specify `reference` parameter to be saved reference data. To be noticed, the reference data should have identical columns as the new data and the new data should contain reference data as its sub sample.
+```{r}
+#| class: highlight-chunk
+# identify reference site(s)
+reference_site <- adni %>%
+  group_by(site) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count)) %>%
+  pull(site) %>%
+  head(30)
+
+reference_df <- adni %>%
+  filter(site %in% reference_site)
+
+# specify harmonization variables
+features    <- colnames(reference_df)[c(43:104)]
+covariates  <- c("timedays", "AGE", "SEX", "DIAGNOSIS")
+interaction <- c("timedays,DIAGNOSIS")
+batch       <- "site"
+
+# harmonize reference data
+ref_model <- combat_harm(
+  type        = "lmer",
+  features    = features,
+  batch       = batch,
+  covariates  = covariates,
+  interaction = interaction,
+  smooth      = NULL,
+  random      = "subid",
+  df          = reference_df
+)
+
+# harmonize new data to the reference data
+harm_new <- combat_harm(
+  type        = "lmer",
+  features    = features,
+  batch       = batch,
+  covariates  = covariates,
+  interaction = interaction,
+  smooth      = NULL,
+  random      = "subid",
+  df          = adni,
+  reference   = ref_model$harmonized_df
+)
+```
+:::
+
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: Out-of-sample using Reference Data
+Using the command-line interface requires users to set the following parameter:
+
+-   `--reference`: Path to the reference dataset 
+```{bash, eval = FALSE}
+#| class: highlight-chunk
+Rscript path/to/combatQC_CLI.R \
+  path/to/unharmonized_data.csv \
+  -d FALSE \
+  --features 43-104 \
+  --covariates 9,11,13-14 \
+  -b 16 \
+  -i 9*14 \
+  -m lmer \
+  -r 3 \
+  --reference path/to/reference.csv \
+  --outdir /path/to/harmonized_data.csv \
+  --mout  /path/to/saved_model.rds
+```
+:::
+
+```{=html}
+<style>
+.mode-toggle {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--quarto-body-bg, #fff);
+  padding: .5rem 0;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+.hidden-by-toggle { display: none !important; }
+</style>
+
+<script>
+(function(){
+  const btnR = document.getElementById('btn-r');
+  const btnCli = document.getElementById('btn-cli');
+
+  // Restore preferences from localStorage
+  let showR = true;
+  let showCli = false;
+
+  try {
+    const saved = JSON.parse(localStorage.getItem('preferredModes'));
+    if (saved) {
+      showR = saved.showR ?? true;
+      showCli = saved.showCli ?? false;
+    }
+  } catch(e){}
+
+  function updateVisibility() {
+    const rEls = document.querySelectorAll('.r-only');
+    const cliEls = document.querySelectorAll('.cli-only');
+
+    rEls.forEach(el => el.classList.toggle('hidden-by-toggle', !showR));
+    cliEls.forEach(el => el.classList.toggle('hidden-by-toggle', !showCli));
+
+    // Button styles
+    btnR.classList.toggle('btn-primary', showR);
+    btnR.classList.toggle('btn-outline-primary', !showR);
+    btnCli.classList.toggle('btn-primary', showCli);
+    btnCli.classList.toggle('btn-outline-primary', !showCli);
+
+    // Save preferences
+    try {
+      localStorage.setItem('preferredModes', JSON.stringify({showR, showCli}));
+    } catch(e){}
+  }
+
+  btnR.addEventListener('click', ()=>{
+    showR = !showR;
+    updateVisibility();
+  });
+
+  btnCli.addEventListener('click', ()=>{
+    showCli = !showCli;
+    updateVisibility();
+  });
+
+  updateVisibility();
+})();
+</script>
+
+
+# Learn More
+- Refer to the [**Example: Post Harmonization**](post.qmd) for a detailed illustration of post harmonization analysis in application.

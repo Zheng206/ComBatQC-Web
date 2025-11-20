@@ -1,0 +1,226 @@
+[
+  {
+    "objectID": "tutorial.html",
+    "href": "tutorial.html",
+    "title": "Tutorials",
+    "section": "",
+    "text": "The ComBatFamQC workflow guides users from raw multi-site data to harmonized, analysis-ready results. You can run the full workflow using the R Shiny app or the command-line interface.\n\n\nStart with your unharmonized dataset that includes:\n\nA feature matrix (e.g., cortical thickness, volume, or connectivity)\nA metadata file containing covariates such as site, age, sex, and diagnosis\n\n\n\n\nDetect and measure site-related variation using interactive plots and statistical tests, including:\n\nInteractive Plots: Residual Box Plots, Exploratory Density Plots, PCA/t-SNE Plots\nStatistical Tests: ANOVA, Kruskal-Wallis, Levene’s, Bartlett’s tests\n\nThese diagnostics help determine whether harmonization is required and which method to apply.\n\n\n\nApply one of four harmonization methods (ComBat, Longitudinal ComBat, ComBat-GAM, or CovBat) to remove site effects while preserving biological variability. After harmonization, reassess batch effects, explore age trends, and generate residual datasets for downstream analysis.\nThe interactive workflow can be found below:\n\n\n\n\n\n\n\n\nClick a node above to display a related figure here, or click an edge to see its explanation."
+  },
+  {
+    "objectID": "tutorial.html#tutorial-videos",
+    "href": "tutorial.html#tutorial-videos",
+    "title": "Tutorials",
+    "section": "Tutorial Videos",
+    "text": "Tutorial Videos\n\n\nInteractive Batch Effect Diagnostic\n\nData Overview\n\n\n\nFigure 1: ComBatFamQC: Data Overview\nThis video introduces the ComBatFamQC interface and data structure, showing how input data are organized and prepared for harmonization.\n\n\n\n\nSummary\n\n\n\nFigure 2: ComBatFamQC: Summary\nAn overview of key summary statistics and visual outputs generated after harmonization, illustrating how ComBatFamQC evaluates data consistency.\n\n\n\n\nResidual Plot\n\n\n\nFigure 3: ComBatFamQC: Residual Plot\nThis tutorial explains how to interpret residual plots to assess whether batch effects remain after harmonization.\n\n\n\n\nDiagnosis of Global Batch Effect\n\n\n\nFigure 4: ComBatFamQC: Diagnosis of Global Batch Effect\nLearn how to identify and visualize overall batch effects across datasets, helping ensure harmonization quality at a global level.\n\n\n\n\nDiagnosis of Individual Batch Effect\n\n\n\nFigure 5: ComBatFamQC: Diagnosis of Individual Batch Effect\nThis video focuses on assessing individual batch-level differences and detecting potential sources of variation after correction.\n\n\n\n\nInteractive Harmonization\n\n\n\nFigure 6: ComBatFamQC: Interactive Harmonization\nExplore how to use the interactive ComBatFamQC interface to fine-tune harmonization parameters and visualize real-time effects.\n\n\n\n\n\nPost-harmonization Analysis\n\n\nInteractive Life Span Age Trend\n\n\n\nFigure 7: Brain ROI Age Trend Visualization\nThis tutorial demonstrates how to visualize age-related changes across brain regions, highlighting lifespan trends using interactive plots."
+  },
+  {
+    "objectID": "method.html",
+    "href": "method.html",
+    "title": "ComBat Methods Guide",
+    "section": "",
+    "text": "This guide provides an overview of the harmonization methods implemented in ComBatFamQC, designed to help users identify which approach best fits their specific study conditions and data characteristics. Multi-site neuroimaging studies often face challenges due to site- or scanner-related variability, known as batch effects, which can obscure true biological signals. The methods described here (ComBat, ComBat-GAM, Longitudinal ComBat, CovBat, and Out-of-Sample Harmonization) offer flexible solutions for correcting these effects across different analytical contexts.\nBy understanding the assumptions and strengths of each method, researchers can select the most appropriate harmonization strategy to ensure their analyses are both comparable across sites and biologically meaningful.\nIn Sample Harmonization in ComBat means training a harmonization model using existing data."
+  },
+  {
+    "objectID": "method.html#combat",
+    "href": "method.html#combat",
+    "title": "ComBat Methods Guide",
+    "section": "ComBat",
+    "text": "ComBat\nComBat is a statistical method used to correct for batch effect in neuroimaging data. In multi-site neuroimaging studies, technical variations can introduce unwanted differences (known as batch effect) that can mask true brain related findings. ComBat applies an empirical Bayes approach to harmonize imaging measurements(like cortical thickness) across batches, while preserving biological and clinical variability. This improves the comparability of neuroimaging results from different sources.\nComBat assumes batch effects exist in the mean and variance of multivariate observations and assumes linear relationships between covariates and features. For site/scanner \\(i\\), subject \\(j\\) and feature at location \\(v\\),\n\\[\ny_{ijv} = \\alpha_v + X_{ij}^T \\beta_v + \\gamma_{iv} + \\delta_{iv} e_{ijv}\n\\] where \\(\\alpha_{v}\\) is the intercept, \\(X_{ij}\\) is the vector of covariates, \\(\\beta_{v}\\) is the vector of regression coefficients, \\(\\gamma_{iv}\\) is the mean site effect, and \\(\\delta_{iv}\\) is the variance site effect. The error \\(e_{ijv}\\) are assumed to independently follow \\(e_{ijv}\\sim N(0,{\\sigma_{v}}^2)\\)."
+  },
+  {
+    "objectID": "method.html#combat-gam",
+    "href": "method.html#combat-gam",
+    "title": "ComBat Methods Guide",
+    "section": "ComBat GAM",
+    "text": "ComBat GAM\nComBat-GAM is an extension of the ComBat method that corrects for batch effects in neuroimaging data using generalized additive models (GAM). In multi-site neuroimaging studies, batch effects arise from both technical differences and complex, nonlinear biological variables such as age. ComBat-GAM addresses this by incorporating flexible, nonlinear modeling of covariates like age and sex, enabling more accurate harmonization of imaging measures (e.g., cortical thickness) across sites. ComBat-GAM assumes that batch effects exist in both the mean and variance of multivariate observations, and that the relationship between covariates and features can be flexibly nonlinear, modeled using Generalized Additive Models (GAMs). For site/scanner \\(i\\), subject \\(j\\) and feature at location \\(v\\),\n\\[\ny_{ijv} = \\alpha_v + f(X_{ij}) + \\gamma_{iv} + \\delta_{iv} e_{ijv}\n\\] where \\(\\alpha_{v}\\) is the intercept, \\(X_{ij}\\) is the vector of covariates, \\(f(\\cdot)\\) is the smooth (nonlinear) function of covariates, \\(\\gamma_iv\\) is the mean site effect, and \\(\\delta_{iv}\\) is the variance site effect. The error \\(e_{ijv}\\) are assumed to independently follow \\(e_{ijv}\\sim N(0,{\\sigma_{v}}^2)\\)."
+  },
+  {
+    "objectID": "method.html#longitudinal-combat",
+    "href": "method.html#longitudinal-combat",
+    "title": "ComBat Methods Guide",
+    "section": "Longitudinal ComBat",
+    "text": "Longitudinal ComBat\nLongitudinal ComBat extends the original ComBat method to harmonize neuroimaging data with repeated measurements from the same subjects over time. By modeling both batch effects and within-subject correlations, Longitudinal ComBat adjusts for site or scanner differences while preserving individual longitudinal trajectories. This approach improves the comparability of multi-site longitudinal studies without removing true biological changes over time. Longitudinal ComBat assumes that batch effects exist in both the mean and variance of multivariate observations aross time, and assumes repeated measures from the same subject are correlated, and it explicitly models these correlations using random effects. For site/scanner \\(i\\), subject \\(j\\), feature at location \\(v\\) and time point \\(t\\), the model can be expressed as:\n\\[\ny_{ijv}(t) = \\alpha_v + X_{ij}^T(t) \\beta_v + \\eta_{ijv} + \\gamma_{iv} + \\delta_{iv} e_{ijv}(t)\n\\] where \\(\\alpha_{v}\\) is the intercept, \\(X_{ij}(t)\\) is the time-varying covariates, \\(\\beta_{v}\\) is the vector of regression coefficients, \\(\\eta_{ijv}\\) is the subject-specific random effect, \\(\\gamma_{iv}\\) is the mean site effect, and \\(\\delta_{iv}\\) is the variance site effect. The time-varying error \\(e_{ijv}(t)\\) is assumed to independently follow \\(e_{ijv}(t) \\sim N(0, \\sigma_{v}^2)\\)."
+  },
+  {
+    "objectID": "method.html#covbat",
+    "href": "method.html#covbat",
+    "title": "ComBat Methods Guide",
+    "section": "CovBat",
+    "text": "CovBat\nCovBat extends the original ComBat method by harmonizing not only the mean and variance, but also the covariance batch effects of neuroimaging data across sites or batches. By adjusting for differences in how features co-vary between sites, CovBat preserves both biological variability and the intricate relationships among features. This method is valuable for multivariate analyses (such as connectivity or network studies) and machine learning applications, as it enhances the comparability of data from multiple sources while maintaining the integrity of underlying biological patterns.\n\\[y_{ijv} = \\alpha_v + X_{ij}^T \\beta_v + \\gamma_{iv} + \\delta_{iv} e_{ijv}\\]\nwhere \\(\\alpha_v\\) is the intercept, \\(X_{ij}\\) is the covariates, \\(\\beta_v\\) is the vector of regression coefficients, and \\(\\gamma_{iv}\\) is the mean site effect. The residuals are modeled as \\(e_{ij} = (e_{ij1}, e_{ij2}, \\ldots, e_{ijp})^T \\sim N(0, \\Sigma_i)\\), where \\(\\Sigma_i\\) is the site-specific covariance matrix that captures covariance differences across sites.\nCovBat addresses covariance differences by using principal component analysis (PCA) on the residuals to align each site’s covariance structure to the pooled covariance across all sites."
+  },
+  {
+    "objectID": "method.html#out-of-sample-harmonization",
+    "href": "method.html#out-of-sample-harmonization",
+    "title": "ComBat Methods Guide",
+    "section": "Out-of-Sample Harmonization",
+    "text": "Out-of-Sample Harmonization\n\nOut-of-sample harmonization refers to the process of applying a previously trained harmonization model to new, incoming data that was not available during the initial model training phase.\n\nUsing Saved ComBat Model\nOut-of-sample harmonization using a saved ComBat model means you first adjust your original data and save the ComBat model, then later use that saved model to correct batch effects in any new data, making it comparable to your original dataset.\n\nExample: You harmonize batch effects in Batch A and save the ComBat model. When you later receive Batch B, you apply the saved model so Batch B is adjusted using the same batch-correction parameters as Batch A, ensuring the two batches are directly comparable\n\n\nToward Reference Data\nOut-of-sample harmonization toward Reference Data involves fitting the ComBat model on the reference dataset and then applying the estimated parameters to new data, so that the new data are standardized to the batch-corrected distribution of the reference.\n\nExample: You choose a high-quality multi-site study as your reference and keep it unchanged. When new data come in, you harmonize them, so they are brought into the same batch-corrected distribution as the reference study."
+  },
+  {
+    "objectID": "diagnostic.html",
+    "href": "diagnostic.html",
+    "title": "Batch Effect Diagnostics",
+    "section": "",
+    "text": "R Code\n    CLI\n  \n\nIn this section, we will use a sample data included in this package to provide a thorough introduction to the key functionalities of the ComBatFamQC package for batch effect diagnostics.\n\nData\n\nThe sample dataset in the package is the longitudinal cortical thickness data from the Alzheimer’s Disease Neuroimaging Initiative (ADNI) study (Jack et al. (2008)), which con- tains cortical thickness measures of 62 regions from 663 unique participants with images collected longitudinally between 2-6 visits. The processed data can be downloaded from GitHub.\nThe key variables of interest are presented below:\n\nBatch variable:\n\nmanufac: MRI manufacturer\n\nCovariates\n\ntimedays: time related variable\nAge\nSEX\nDIAGNOSIS: (AD, CN, LMCI)\n\n(We consider an interaction effect between timedays and DIAGNOSIS)\nFeatures to harmonize\n\n62 cortical thickness regions\n\nRandom Effect\n\nsubid : Subject IDs.\n\n\n\n\nInteractive Batch Effect Diagnostics\n\nThe diagnostic workflow is the same whether you use R or the CLI:\n\nSet up variables: Select features, batch, covariates, interactions, and random effects.\nFit the diagnostic model: A linear mixed-effects model (lmer) evaluates batch effects while accounting for repeated measures.\nView diagnostics: Inspect plots showing batch trends, covariate effects, and distribution differences.\nInterpret results: Use the summaries and visualizations to determine whether harmonization is needed.\n\nYou can run this workflow through R or through the CLI. Expand the panels below to see the corresponding code.\n\n\n\n\n\n\nR code: Model Fitting & Diagnostics\n\n\n\n\n\nThe R interface prepares the data, fits the models, and launches an interactive Shiny app for diagnostics using visual_prep()and comfam_shiny().\n\nfeatures <- colnames(adni)[c(43:104)]\ncovariates <- c(\"timedays\", \"AGE\", \"SEX\", \"DIAGNOSIS\")\ninteraction <- c(\"timedays,DIAGNOSIS\")\nbatch <- \"manufac\"\nresult_lmer <- visual_prep(\n  type = \"lmer\",\n  features = features,\n  batch = batch,\n  covariates = covariates,\n  interaction = interaction,\n  smooth = NULL,\n  random = \"subid\",\n  df = adni\n)\ncomfam_shiny(result_lmer)\n\nWhat this does (summary):\n\nSelects columns 43–104 as features (62 cortical thickness regions).\nUses manufac as the batch variable.\nIncludes timedays , AGE , SEX , and DIAGNOSIS , plus the timedays × DIAGNOSIS interaction.\nTreats subid as a random effect for subject-level correlation.\nLaunches a Shiny app to explore diagnostic plots interactively.\n\n\n\n\nIf you prefer CLI, you can run the same workflow directly from the terminal. This approach is especially convenient for automation, scripting, or large-scale batch runs.\n\n\n\n\n\n\nCLI code: Model Fitting & Diagnostics\n\n\n\n\n\nThe CLI interface mirrors the R workflow but is designed for scripting and batch runs.\n\nRscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv \\\n  -d TRUE -v TRUE \\\n  --features 43-104 \\\n  --covariates 9,11,13-14 \\\n  -b 16 -i 9*14 -r 3 -m lmer\n\nMain options overview:\n\n--diagnosis/-d: whether to include diagnosis effects (default TRUE)\n\n--visualization/-v: whether to generate diagnostic visuals (default TRUE)\n\n--features/-f: feature columns (e.g., 43–104)\n\n--covariates/-c: covariate columns\n\n--batch/-b: batch column\n\n--smooth/-s: smooth term column (for gam)\n\n--random/-r: random-effect column (for lmer)\n\n\n\n\nAfter running either workflow, ComBatFamQC will produce diagnostic plots and summaries that help you visually and quantitatively assess batch effects before harmonization.\n\n\nExporting Results\n\nOnce diagnostics are complete, you may want to:\n\nSave tabular summaries (e.g., per-feature statistics, model summaries), or\nProduce a standalone report that documents the diagnostic analysis.\n\nComBatFamQC supports both use cases via R functions and CLI options.\n\nExport from R\nYou can export results either as an Excel file or a Quarto report. Both options use the same underlying diagnostics object produced in the previous step\n\n\n\n\n\n\nR code: Excel Report\n\n\n\n\n\n\ndiag_save(path = \"path/to/dir\", result = result_lmer, use_quarto = FALSE)\n\n\n\n\n\n\n\n\n\n\nR code: Quarto Report\n\n\n\n\n\n\nlibrary(quarto)\ndiag_save(path = \"path/to/dir\", result = result_lmer, use_quarto = TRUE)\n\n\n\n\n\n\nExport from CLI\nFrom the command line, you can run diagnostics and export results in a single step or perform diagnostics first and export later. The CLI supports both Excel-style outputs and Quarto report generation.\n\n\n\n\n\n\nCLI code: Export Diagnostics\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R path/to/unharmonized_data.csv \\\n  -d TRUE -v FALSE \\\n  --features 43-104 \\\n  --covariates 9,11,13-14 \\\n  -b 16 -i 9*14 -r 3 -m lmer \\\n  --outdir /path/to/dir\\\n  --quarto TRUE\n\nMain options overview:\n\n--visualization/-v: set to FALSE when exporting only\n\n--outdir: directory for outputs\n\n--quarto/-q: whether to generate a Quarto report\n\n\n\n\n\n\n\n\n\nLearn More\n\nCheck out the Example: Harmonization for a hands-on look at how to apply harmonization methods effectively."
+  },
+  {
+    "objectID": "harmonization.html",
+    "href": "harmonization.html",
+    "title": "Harmonization",
+    "section": "",
+    "text": "R Code\n    CLI\nComBatFamQC provides four types of commonly used harmonization techniques, integrated through the ComBatFamily package developed by Dr. Andrew Chen, for users to consider. The four harmonization techniques include:\nThere are two types of harmonization scenarios users can choose from:"
+  },
+  {
+    "objectID": "harmonization.html#combat",
+    "href": "harmonization.html#combat",
+    "title": "Harmonization",
+    "section": "ComBat",
+    "text": "ComBat\nA method designed for batch effect correction in cross-sectional data with linear covariate effects.\n\n\n\n\n\n\nR code: ComBat\n\n\n\n\n\n\nfeatures <- colnames(adni)[c(43:104)]\ncovariates <- c(\"timedays\", \"AGE\", \"SEX\", \"DIAGNOSIS\")\ninteraction <- c(\"timedays,DIAGNOSIS\")\nbatch <- \"manufac\"\ncombat_model <- combat_harm(\n  type        = \"lm\",\n  features    = features,\n  batch       = batch,\n  covariates  = covariates,\n  interaction = interaction,\n  smooth      = NULL,\n  random      = NULL,\n  df          = adni\n)\nhead(combat_model$harmonized_df)\n\n\n\n\n\n\n\n\n\n\nCLI code: ComBat\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R \\\n  path/to/unharmonized_data.csv \\\n  -d FALSE \\\n  --features 43-104 \\\n  --covariates 9,11,13-14 \\\n  -b 16 \\\n  -i 9*14 \\\n  -m lm \\\n  --outdir /path/to/harmonized_data.csv \\\n  --mout  /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "harmonization.html#longitudinal-combat",
+    "href": "harmonization.html#longitudinal-combat",
+    "title": "Harmonization",
+    "section": "Longitudinal ComBat",
+    "text": "Longitudinal ComBat\nA method accounts for intra-subject correlation in longitudinal data by incorporating random effects into the model.\n\n\n\n\n\n\nR code: Longitudinal ComBat\n\n\n\n\n\n\ncombat_model_lmer <- combat_harm(\n  type        = \"lmer\",\n  features    = features,\n  batch       = batch,\n  covariates  = covariates,\n  interaction = interaction,\n  smooth      = NULL,\n  random      = \"subid\",\n  df          = adni\n)\n\nhead(combat_model_lmer$harmonized_df)\n\n\n\n\n\n\n\n\n\n\nCLI code: Longitudinal ComBat\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R \\\n  path/to/unharmonized_data.csv \\\n  -d FALSE \\\n  --features 43-104 \\\n  --covariates 9,11,13-14 \\\n  -b 16 \\\n  -i 9*14 \\\n  -m lmer \\\n  -r 3 \\\n  --outdir /path/to/harmonized_data.csv \\\n  --mout  /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "harmonization.html#combat-gam",
+    "href": "harmonization.html#combat-gam",
+    "title": "Harmonization",
+    "section": "ComBat-GAM",
+    "text": "ComBat-GAM\nA method allows for preservation of non-linear covariate effects through use of the generalized additive model.\n\n\n\n\n\n\nR code: ComBat-GAM\n\n\n\n\n\n\ncombat_model_gam <- combat_harm(\n  type            = \"gam\",\n  features        = features,\n  batch           = batch,\n  covariates      = covariates,\n  interaction     = interaction,\n  smooth          = \"AGE\",\n  smooth_int_type = \"linear\",\n  df              = adni\n)\n\nhead(combat_model_gam$harmonized_df)\n\n\n\n\n\n\n\n\n\n\nCLI code: ComBat-GAM\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R \\\n  path/to/unharmonized_data.csv \\\n  -d FALSE \\\n  --features 43-104 \\\n  --covariates 9,11,13-14 \\\n  -b 16 \\\n  -i 9*14 \\\n  -m gam \\\n  -s 11 \\\n  --outdir /path/to/harmonized_data.csv \\\n  --mout  /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "harmonization.html#covbat",
+    "href": "harmonization.html#covbat",
+    "title": "Harmonization",
+    "section": "CovBat",
+    "text": "CovBat\nCovBat is used for correcting covariance batch effects.\n\n\n\n\n\n\nR code: CovBat\n\n\n\n\n\n\ncovbat_model <- combat_harm(\n  type            = \"gam\",\n  features        = features,\n  batch           = batch,\n  covariates      = covariates,\n  interaction     = interaction,\n  smooth          = \"AGE\",\n  smooth_int_type = \"linear\",\n  df              = adni,\n  family          = \"covfam\"\n)\n\nhead(covbat_model$harmonized_df)\n\n\n\n\n\n\n\n\n\n\nCLI code: CovBat\n\n\n\n\n\n\nRscript path/to/combatQC_CLI.R \\\n  path/to/unharmonized_data.csv \\\n  -d FALSE \\\n  --features 43-104 \\\n  --covariates 9,11,13-14 \\\n  -b 16 \\\n  -i 9*14 \\\n  -m gam \\\n  -s 11 \\\n  -f covfam \\\n  --outdir /path/to/harmonized_data.csv \\\n  --mout  /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "harmonization.html#from-combat-model",
+    "href": "harmonization.html#from-combat-model",
+    "title": "Harmonization",
+    "section": "from ComBat Model",
+    "text": "from ComBat Model\n\n\n\n\n\n\nR code: Out-of-sample ComBat\n\n\n\n\n\nSpecify predict parameter to be TRUE and object parameter to be saved ComBat model.\n\nsaved_model <- combat_model_gam$combat.object\n\nharm_predict <- combat_harm(\n  df      = adni %>% head(1000),\n  predict = TRUE,\n  object  = saved_model\n)\n\n\n\n\n\n\n\n\n\n\nCLI code: Out-of-sample ComBat\n\n\n\n\n\nUsing the command-line interface requires users to set the following parameter:\n\n--predict: TRUE\n--object/-o: Path to the saved ComBat model (in .rds format)\n\n\nRscript path/to/combatQC_CLI.R \\\n  path/to/unharmonized_data.csv \\\n  -d FALSE \\\n  --predict TRUE \\\n  -o path/to/saved_model.rds \\\n  --outdir /path/to/harmonized_data.csv"
+  },
+  {
+    "objectID": "harmonization.html#from-covbat-model",
+    "href": "harmonization.html#from-covbat-model",
+    "title": "Harmonization",
+    "section": "from CovBat Model",
+    "text": "from CovBat Model\n\n\n\n\n\n\nR code: Out-of-sample CovBat\n\n\n\n\n\nSpecify predict parameter to be TRUE and object parameter to be saved CovBat model.\n\nsaved_model <- covbat_model$combat.object\n\nharm_predict <- combat_harm(\n  df      = adni,\n  predict = TRUE,\n  object  = saved_model\n)\n\n\n\n\n\n\n\n\n\n\nCLI code: Out-of-Sample CovBat\n\n\n\n\n\nUsing the command-line interface requires users to set the following parameter:\n\n-d/--diagnosis: set to FALSE to run harmonization (use TRUE to run batch effect diagnostics only)\n--predict: set to TRUE for out-of-sample harmonization using a saved covbat model\n--object/-o: Path to the saved CovBat model file (.rds)\n--outdir: Path to write the harmonized data (.csv)\n\n\nRscript path/to/combatQC_CLI.R \\\n  path/to/unharmonized_data.csv \\\n  -d FALSE \\\n  --predict TRUE \\\n  -o path/to/saved_model.rds \\\n  --outdir /path/to/harmonized_data.csv"
+  },
+  {
+    "objectID": "harmonization.html#from-reference-data",
+    "href": "harmonization.html#from-reference-data",
+    "title": "Harmonization",
+    "section": "from Reference Data",
+    "text": "from Reference Data\n\n\n\n\n\n\nR code: Out-of-sample using Reference Data\n\n\n\n\n\nSpecify reference parameter to be saved reference data. To be noticed, the reference data should have identical columns as the new data and the new data should contain reference data as its sub sample.\n\n# identify reference site(s)\nreference_site <- adni %>%\n  group_by(site) %>%\n  summarize(count = n()) %>%\n  arrange(desc(count)) %>%\n  pull(site) %>%\n  head(30)\n\nreference_df <- adni %>%\n  filter(site %in% reference_site)\n\n# specify harmonization variables\nfeatures    <- colnames(reference_df)[c(43:104)]\ncovariates  <- c(\"timedays\", \"AGE\", \"SEX\", \"DIAGNOSIS\")\ninteraction <- c(\"timedays,DIAGNOSIS\")\nbatch       <- \"site\"\n\n# harmonize reference data\nref_model <- combat_harm(\n  type        = \"lmer\",\n  features    = features,\n  batch       = batch,\n  covariates  = covariates,\n  interaction = interaction,\n  smooth      = NULL,\n  random      = \"subid\",\n  df          = reference_df\n)\n\n# harmonize new data to the reference data\nharm_new <- combat_harm(\n  type        = \"lmer\",\n  features    = features,\n  batch       = batch,\n  covariates  = covariates,\n  interaction = interaction,\n  smooth      = NULL,\n  random      = \"subid\",\n  df          = adni,\n  reference   = ref_model$harmonized_df\n)\n\n\n\n\n\n\n\n\n\n\nCLI code: Out-of-sample using Reference Data\n\n\n\n\n\nUsing the command-line interface requires users to set the following parameter:\n\n--reference: Path to the reference dataset\n\n\nRscript path/to/combatQC_CLI.R \\\n  path/to/unharmonized_data.csv \\\n  -d FALSE \\\n  --features 43-104 \\\n  --covariates 9,11,13-14 \\\n  -b 16 \\\n  -i 9*14 \\\n  -m lmer \\\n  -r 3 \\\n  --reference path/to/reference.csv \\\n  --outdir /path/to/harmonized_data.csv \\\n  --mout  /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "news.html",
+    "href": "news.html",
+    "title": "News",
+    "section": "",
+    "text": "Coming Soon"
+  },
+  {
+    "objectID": "post.html",
+    "href": "post.html",
+    "title": "Post Harmonization",
+    "section": "",
+    "text": "R Code\n    CLI\nComBatFamQC currently offers two types of post-harmonization downstream analysis tools: (1) interactive life span age trend visualization and (2) customized residual generation. The life span age trend visualization provides age centile fits for each brain structure, adjusted for sex and intracranial volume (ICV). The customized residual generation feature enables users to remove the effects of unwanted covariates while retaining those of interest in the harmonized data."
+  },
+  {
+    "objectID": "post.html#generate-residuals-from-scratch",
+    "href": "post.html#generate-residuals-from-scratch",
+    "title": "Post Harmonization",
+    "section": "Generate Residuals from Scratch",
+    "text": "Generate Residuals from Scratch\nThis option refits the regression model on the harmonized dataset and then removes the chosen covariates.\n\n\n\n\n\n\nR code: Residuals from Scratch\n\n\n\n\n\n\n# get harmonized dataset\nfeatures <- colnames(adni)[c(43:104)]\ncovariates <- c(\"timedays\", \"AGE\", \"SEX\", \"DIAGNOSIS\")\ninteraction <- c(\"timedays,DIAGNOSIS\")\nbatch <- \"manufac\"\n\ncombat_model <- combat_harm(\n  type        = \"lm\",\n  features    = features,\n  batch       = batch,\n  covariates  = covariates,\n  interaction = interaction,\n  smooth      = NULL,\n  random      = NULL,\n  df          = adni\n)\n\nharmonized_df <- combat_model$harmonized_df\n\n# generate residuals by removing timedays and DIAGNOSIS effects, while preserving AGE and SEX effects.\nresult_residual <- residual_gen(\n  type        = \"lm\",\n  features    = features,\n  covariates  = covariates,\n  interaction = interaction,\n  smooth      = NULL,\n  df          = harmonized_df,\n  rm          = c(\"timedays\", \"DIAGNOSIS\")\n)\n\n# save residual data set\nwrite.csv(result_residual$residual, \"path/to/save/residual.csv\")\n# save regression model\nsaveRDS(result_residual$model, \"path/to/save/regression_model.rds\")\n\n(optional if users do not wish to save the model)\n\n\n\n\n\n\n\n\n\nCLI code: Residuals from Scratch\n\n\n\n\n\nUsing the command-line interface to start the residual generation stage requires users to set the following parameter:\n\n--type\\-t: “residual”\n--outdir: Path to save the harmonized dataset (in .csv format)\n--mout: Path to save the regression model (in .rds format)\n\n\nRscript path/to/post_CLI.R path/to/harmonized_data.csv \\\n  -t residual \\\n  --features 43-104 \\\n  --covariates 9,11,13-14 \\\n  -m lm \\\n  --rm 9,14 \\\n  --outdir /path/to/harmonized_data.csv \\\n  --mout /path/to/saved_model.rds"
+  },
+  {
+    "objectID": "post.html#generate-residuals-from-existing-model",
+    "href": "post.html#generate-residuals-from-existing-model",
+    "title": "Post Harmonization",
+    "section": "Generate Residuals from Existing Model",
+    "text": "Generate Residuals from Existing Model\nThis method requires users to supply a pre-trained model.\n\n\n\n\n\n\nR code: Residuals from Existing Model\n\n\n\n\n\n\nresult_residual <- residual_gen(\n  df         = harmonized_df,\n  rm         = c(\"timedays\", \"DIAGNOSIS\"),\n  model      = TRUE,\n  model_path = \"path/to/save/regression_model.rds\"\n)\n\n\n\n\n\n\n\n\n\n\nCLI code: Residuals from Existing Model\n\n\n\n\n\nUsing the command-line interface requires users to set the following parameter:\n\n--exist.model: TRUE\nmodel.path: Path to the saved regression model.\n\n\nRscript path/to/post_CLI.R path/to/harmonized_data.csv \\\n  -t residual \\\n  --exist.model TRUE \\\n  --model.path /path/to/saved_model.rds \\\n  --outdir /path/to/harmonized_data.csv"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ComBatFamQC",
+    "section": "",
+    "text": "ComBatFamQC is an R package that integrates batch effect diagnostics, data harmonization, and post-harmonization analysis for multi-site studies.\nIt combines interactive visualization and statistical testing to help users detect unwanted site effects, harmonize data across scanners or batches, and analyze results in a single, integrated workflow."
+  },
+  {
+    "objectID": "index.html#key-features",
+    "href": "index.html#key-features",
+    "title": "ComBatFamQC",
+    "section": "Key Features",
+    "text": "Key Features\nComBatFamQC integrates several powerful tools that guide users through the complete harmonization process, from detecting batch effects to generating harmonized and analysis-ready data.\n\nBuilt-in Harmonization\n\nProvides four harmonization methods:\nComBat, Longitudinal ComBat, ComBat-GAM, and CovBat\n\nPreserves important covariates such as age, sex, and diagnosis\n\nProduces harmonized data that are directly comparable across sites\n\n\n\nBatch Effect Diagnostics\n\nIdentify and measure batch effects through interactive visualizations and statistical tests\n\nEvaluate harmonization quality and detect remaining site-related variation\n\n\n\nPost-Harmonization Analysis\n\nVisualize life-span age trends across brain regions\n\nGenerate covariate-corrected residuals for downstream statistical or machine learning analyses"
+  },
+  {
+    "objectID": "index.html#usage-options",
+    "href": "index.html#usage-options",
+    "title": "ComBatFamQC",
+    "section": "Usage Options",
+    "text": "Usage Options\nComBatFamQC offers two user-friendly ways to fit different analysis needs:\n\nR Shiny interface for interactive exploration and visualization\n\nCommand-line tools for automated and large-scale processing:\nCombatQC_CLI.R for diagnostics and harmonization\npost_CLI.R for post-harmonization visualization and residual generation"
+  },
+  {
+    "objectID": "index.html#learn-more",
+    "href": "index.html#learn-more",
+    "title": "ComBatFamQC",
+    "section": "Learn More",
+    "text": "Learn More\n\nVisit Get Started for installation, command-line usage, and vignette access."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Get Started",
+    "section": "",
+    "text": "You can install the latest version of ComBatFamQC directly from GitHub using the R package devtools.\n\nOpen R or RStudio\n\nRun the following commands:\n\n\nif (!require(\"devtools\", quietly = TRUE)) {\n  install.packages(\"devtools\")}\nlibrary(devtools)\ninstall_github(\"Zheng206/ComBatFamQC\", build_vignettes = TRUE)"
+  },
+  {
+    "objectID": "about.html#usage-options",
+    "href": "about.html#usage-options",
+    "title": "Get Started",
+    "section": "Usage Options",
+    "text": "Usage Options\n\nComBatFamQC can be used in two main modes depending on your workflow needs.\n\n1. Interactive Mode\nUse the R Shiny app to explore data, check batch effects, and perform harmonization interactively.\nComBatFamQC can also be used directly in R or RStudio for scripted workflows after loading the package:\n\nlibrary(ComBatFamQC)\n\n\n\n2. Command-Line Mode\nUse the command-line interface for automated, scalable processing of large or scripted analyses.\nAfter installing ComBatFamQC in R, you can quickly access the built-in CLI scripts by running the following commands in your terminal:\n\nRSCRIPT=${RSCRIPT:-$(command -v Rscript)}\ncombatqc_cli=\"$($RSCRIPT -e 'cat(system.file(\"combatQC_CLI.R\", package=\"ComBatFamQC\"))')\"\npost_cli=\"$($RSCRIPT -e 'cat(system.file(\"post_CLI.R\", package=\"ComBatFamQC\"))')\"\n\n# Display usage information\nRscript \"$combatqc_cli\" -h\nRscript \"$post_cli\" -h\n\nAlternatively, run directly using explicit paths:\n\nRscript path/to/CombatQC_CLI.R -h\nRscript path/to/post_CLI.R -h\n\nScripts Overview:\n\nThe CombatQC_CLI.R script: the batch effect diagnostics and harmonization stage, providing interactive tools to diagnose and adjust for batch effects effectively.\nThe post_CLI.R script: the post-harmonization stage, where users can visualize age trends across various brain structures and generate a residual dataset that excludes the effects of unwanted covariates."
+  },
+  {
+    "objectID": "about.html#view-vignettes",
+    "href": "about.html#view-vignettes",
+    "title": "Get Started",
+    "section": "View Vignettes",
+    "text": "View Vignettes\n\nComBatFamQC includes built-in vignettes that provide detailed, step-by-step examples.\n\nvignette(\"ComBatQC\")\nvignette(\"Post-Harmonization\")"
+  },
+  {
+    "objectID": "about.html#learn-more",
+    "href": "about.html#learn-more",
+    "title": "Get Started",
+    "section": "Learn More",
+    "text": "Learn More\n\nSee the Methods Guide for detailed explanations of the harmonization algorithms"
+  },
+  {
+    "objectID": "help.html",
+    "href": "help.html",
+    "title": "Help",
+    "section": "",
+    "text": "ComBatFamQC is an R package designed for batch effect diagnostics, data harmonization, and post-harmonization analysis in multi-site studies.\nIt helps identify and correct unwanted site or scanner effects while preserving biological signals.\n\n\n\nYes. The package includes command-line scripts that can be run directly in your terminal for automated or large-scale processing.\n\n\n\nComBatFamQC integrates four type of first time harmonization methods: Original ComBat, Longitudinal ComBat, ComBat-GAM, CovBat In addition, ComBatFamQC supports out-of-sample harmonization using ComBat and CovBat, allowing new data to be harmonized based on previously fitted models.\n\n\n\nYou’ll need:\n\nA feature matrix (subjects × features; e.g., cortical thickness, volume, or connectivity)\nA metadata file including the batch variable (e.g., site/scanner) and relevant covariates such as age, sex, and diagnosis."
+  },
+  {
+    "objectID": "help.html#get-support",
+    "href": "help.html#get-support",
+    "title": "Help",
+    "section": "Get Support",
+    "text": "Get Support\nIf you have a question about this package, please open an issue on GitHub. The maintainers will be notified about your post and will respond when they’re able.\nIf you have used ComBatFamQC in your research and would like to share a summary of your work as a blog post on this website, please open an issue. The maintainers will collaborate with you to create and publish your post.\nLast updated: November 2025"
+  },
+  {
+    "objectID": "references.html",
+    "href": "references.html",
+    "title": "Reference",
+    "section": "",
+    "text": "Johnson, W. E., Li, C., & Rabinovic, A. (2007).\nAdjusting batch effects in microarray expression data using empirical Bayes methods.\nBiostatistics, 8(1), 118–127.\nBeer, J. C., Tustison, N. J., Cook, P. A., Davatzikos, C., Sheline, Y. I., Shinohara, R. T., & Linn, K. A. (2020).\nLongitudinal ComBat: A method for harmonizing longitudinal multi-scanner imaging data.\nNeuroImage, 220, 117129.\nPomponio, R., Erus, G., Habes, M., et al. (2020).\nHarmonization of large MRI datasets for the analysis of brain imaging patterns throughout the lifespan.\nNeuroImage, 208, 116450.\nChen, A. A., Beer, J. C., Tustison, N. J., et al. (2021).\nMitigating site effects in covariance for machine learning in neuroimaging data.\nHuman Brain Mapping, 42(9), 2863–2875"
+  }
+]

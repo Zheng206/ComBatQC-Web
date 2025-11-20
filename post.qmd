@@ -1,0 +1,327 @@
+---
+title: "Post Harmonization"
+format: html
+---
+```{=html}
+<!-- Right-side fixed toggle -->
+<div class="mode-toggle" role="group" aria-label="Select mode">
+  <div class="btn-group">
+    <button id="btn-r" class="btn btn-primary" type="button">R Code</button>
+    <button id="btn-cli" class="btn btn-outline-primary" type="button">CLI</button>
+  </div>
+</div>
+```
+**[ComBatFamQC]{style="color:#C83F49"}** currently offers two types of post-harmonization downstream analysis tools: (1) **interactive life span age trend visualization** and (2) **customized residual generation**. The life span age trend visualization provides age centile fits for each brain structure, adjusted for sex and intracranial volume (ICV). The customized residual generation feature enables users to remove the effects of unwanted covariates while retaining those of interest in the harmonized data.
+
+# Interactive Life Span Age Trend
+___
+
+To better demonstrate how to use the function in R, we utilized a simulated dataset, `age_df`, for illustration. Note that if you are implementing this in R, there are several essential steps to set up the workflow:
+
+-   **[Step 1]** Generate a list of structured datasets for all brain ROIs. Each ROI dataset should contain the following four columns:
+
+    -   **roi.name**: ROI value
+    -   **age**: subject's age information
+    -   **sex**: subject's sex information
+    -   **icv**: subject's intracranial volume
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Prepare ROI-wise Data
+```{r}
+# import the package and load the data
+library(ComBatFamQC)
+library(parallel)
+data(age_df)
+# specify parameters
+age_df <- data.frame(age_df)
+features <- colnames(age_df)[c(6:56)]
+age <- "age"
+sex <- "sex"
+icv <- "ICV_baseline"
+age_df[[sex]] <- as.factor(age_df[[sex]])
+# create sub_df for different features
+sub_df_list <- lapply(seq_len(length(features)), function(i){
+    sub_df <- age_df[,c(features[i], age, sex, icv)] %>% na.omit()
+    colnames(sub_df) <- c(features[i], "age", "sex", "icv")
+    return(sub_df)
+  })
+```
+:::
+
+-   **[Step 2]** Create age trend datasets for all ROIs.
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Generate Age Trend Objects
+```{r}
+# For MAC users
+age_list <- mclapply(seq_len(length(features)), function(w){
+  age_sub <- age_list_gen (sub_df = sub_df_list[[w]],  lq = 0.25, hq = 0.75)
+  return(age_sub)
+}, mc.cores = detectCores()) 
+
+# For Windows users
+age_list <- mclapply(1:length(features), function(w){
+  age_sub <- age_list_gen (sub_df = sub_df_list[[w]],  lq = 0.25, hq = 0.75)
+  return(age_sub)
+}, mc.cores = 1) 
+
+## these two lines are important!!
+names(age_list) <- features
+quantile_type <- c(paste0("quantile_", 100*0.25), "median", paste0("quantile_", 100*0.75))
+```
+:::
+
+-   **[Step 3]** Start an interactive session for age trend visualization. 
+
+    Users can choose to generate an interactive age trend plot using the `plotly` package or a static plot using the `ggplot2` package.
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Interactive vs Static Age Trends
+```{r}
+# Interactive Plot
+library(plotly)
+ComBatFamQC::age_shiny(age_list, features, quantile_type, use_plotly = TRUE)
+# Static Plot
+ComBatFamQC::age_shiny(age_list, features, quantile_type, use_plotly = FALSE)
+```
+:::
+
+Alternatively, users can utilize the command-line interface via **post_CLI.R**. The essential steps have been streamlined, significantly simplifying the workflow and making it easier to get started. 
+
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: Age Trends
+The following parameters must be assigned values:
+
+-   `--features/-f`: position of features/rois data(column numbers)
+-   `--AGE/-A`: column position of the age variable
+-   `--SEX/-S`: column position of the sex variable
+-   `--ICV/I`:  column position of the ICV variable
+-   `--Female/-F`: female indicator, the value represent female in the sex column
+-   `--ploty/-p`: whether to generate `plotly` interactive plots
+```{bash, eval = FALSE}
+#| class: highlight-chunk
+Rscript path/to/post_CLI.R path/to/data.csv -f 16-273 -A 9 -S 10 -I 11 -F "F" -p TRUE
+```
+:::
+
+# Export Age Trend Table and GAMLSS Model
+___
+You can export both the age trend tables and the fitted GAMLSS models for later reuse.
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Save age trends and GAMLSS model
+```{r}
+# Save age trend table
+age_save(path = "path/to/save", age_list = age_list)
+
+# Save GAMLSS Model
+gamlss_model <- lapply(seq_len(length(age_list)), function(i){
+        g_model <- age_list[[i]]$model
+        return(g_model)})
+names(gamlss_model) <- names(age_list)
+saveRDS(gamlss_model, file = "path/to/save/gamlss_model.rds")
+```
+:::
+
+For the CLI, you can export both the age trend table and GAMLSS model in one step.
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: Export Age Trends and Model
+Required options:
+
+-   `--visualization/-v`: `FALSE`
+-   `--outdir`: Path to a directory for saving the age trend table
+-   `--mout`: Path to save the GAMLSS model (in .rds format)
+```{bash, eval = FALSE}
+#| class: highlight-chunk
+Rscript path/to/post_CLI.R path/to/data.csv \
+  -f 16-273 \
+  -A 9 \
+  -S 10 \
+  -I 11 \
+  -F "F" \
+  -v FALSE \
+  --outdir path/to/dir \
+  --mout path/to/save/gamlss_model.rds
+```
+:::
+
+# Customized Residual Generation
+___
+
+**[ComBatFamQC]{style="color:#C83F49"}** offers users the flexibility to create various sets of residuals by removing the effects of specific covariates. To maximize the utility of this feature, it is important to carefully choose parameters based on the type of regression and the covariates to be adjusted for.
+
+The tool provides two methods for generating residuals: 1) creating residuals from scratch and 2) deriving residuals from an existing model. Detailed examples are provided below. We continue to use the ADNI dataset for demonstration.
+
+## Generate Residuals from Scratch
+
+This option refits the regression model on the harmonized dataset and then removes the chosen covariates.
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Residuals from Scratch
+```{r}
+#| class: highlight-chunk
+# get harmonized dataset
+features <- colnames(adni)[c(43:104)]
+covariates <- c("timedays", "AGE", "SEX", "DIAGNOSIS")
+interaction <- c("timedays,DIAGNOSIS")
+batch <- "manufac"
+
+combat_model <- combat_harm(
+  type        = "lm",
+  features    = features,
+  batch       = batch,
+  covariates  = covariates,
+  interaction = interaction,
+  smooth      = NULL,
+  random      = NULL,
+  df          = adni
+)
+
+harmonized_df <- combat_model$harmonized_df
+
+# generate residuals by removing timedays and DIAGNOSIS effects, while preserving AGE and SEX effects.
+result_residual <- residual_gen(
+  type        = "lm",
+  features    = features,
+  covariates  = covariates,
+  interaction = interaction,
+  smooth      = NULL,
+  df          = harmonized_df,
+  rm          = c("timedays", "DIAGNOSIS")
+)
+
+# save residual data set
+write.csv(result_residual$residual, "path/to/save/residual.csv")
+# save regression model
+saveRDS(result_residual$model, "path/to/save/regression_model.rds")
+```
+    (optional if users do not wish to save the model)
+:::
+
+
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: Residuals from Scratch
+
+Using the command-line interface to start the residual generation stage requires users to set the following parameter:
+
+-   `--type\-t`: "residual"
+-   `--outdir`: Path to save the harmonized dataset (in .csv format)
+-   `--mout`: Path to save the regression model (in .rds format)
+
+```{bash, eval = FALSE}
+#| class: highlight-chunk
+Rscript path/to/post_CLI.R path/to/harmonized_data.csv \
+  -t residual \
+  --features 43-104 \
+  --covariates 9,11,13-14 \
+  -m lm \
+  --rm 9,14 \
+  --outdir /path/to/harmonized_data.csv \
+  --mout /path/to/saved_model.rds
+```
+:::
+
+
+## Generate Residuals from Existing Model
+
+This method requires users to supply a pre-trained model.
+
+::: {.callout-note .r-only collapse="true"}
+## R code: Residuals from Existing Model
+```{r}
+result_residual <- residual_gen(
+  df         = harmonized_df,
+  rm         = c("timedays", "DIAGNOSIS"),
+  model      = TRUE,
+  model_path = "path/to/save/regression_model.rds"
+)
+```
+:::
+
+
+::: {.callout-tip .cli-only collapse="true"}
+## CLI code: Residuals from Existing Model
+Using the command-line interface requires users to set the following parameter:
+
+-   `--exist.model`: `TRUE`
+-   `model.path`: Path to the saved regression model.
+```{bash, eval = FALSE}
+#| class: highlight-chunk
+Rscript path/to/post_CLI.R path/to/harmonized_data.csv \
+  -t residual \
+  --exist.model TRUE \
+  --model.path /path/to/saved_model.rds \
+  --outdir /path/to/harmonized_data.csv
+```
+:::
+
+
+```{=html}
+<style>
+.mode-toggle {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--quarto-body-bg, #fff);
+  padding: .5rem 0;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+.hidden-by-toggle { display: none !important; }
+</style>
+
+<script>
+(function(){
+  const btnR = document.getElementById('btn-r');
+  const btnCli = document.getElementById('btn-cli');
+
+  // Restore preferences from localStorage
+  let showR = true;
+  let showCli = false;
+
+  try {
+    const saved = JSON.parse(localStorage.getItem('preferredModes'));
+    if (saved) {
+      showR = saved.showR ?? true;
+      showCli = saved.showCli ?? false;
+    }
+  } catch(e){}
+
+  function updateVisibility() {
+    const rEls = document.querySelectorAll('.r-only');
+    const cliEls = document.querySelectorAll('.cli-only');
+
+    rEls.forEach(el => el.classList.toggle('hidden-by-toggle', !showR));
+    cliEls.forEach(el => el.classList.toggle('hidden-by-toggle', !showCli));
+
+    // Button styles
+    btnR.classList.toggle('btn-primary', showR);
+    btnR.classList.toggle('btn-outline-primary', !showR);
+    btnCli.classList.toggle('btn-primary', showCli);
+    btnCli.classList.toggle('btn-outline-primary', !showCli);
+
+    // Save preferences
+    try {
+      localStorage.setItem('preferredModes', JSON.stringify({showR, showCli}));
+    } catch(e){}
+  }
+
+  btnR.addEventListener('click', ()=>{
+    showR = !showR;
+    updateVisibility();
+  });
+
+  btnCli.addEventListener('click', ()=>{
+    showCli = !showCli;
+    updateVisibility();
+  });
+
+  updateVisibility();
+})();
+</script>
+
+
+# Learn More
+- Explore the [**Tutorials**](tutorial.qmd) to watch several video demonstrations of how this R Shiny app is used in practice.

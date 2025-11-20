@@ -1,0 +1,41 @@
+---
+title: "ComBatFamQC"
+---
+
+**[ComBatFamQC]{style="color:#C83F49"}** is an R package that integrates **[batch effect diagnostics]{style="color:#50C878"}**, **[data harmonization]{style="color:#728FCE"}**, and **[post-harmonization analysis]{style="color:#E56E94"}** for multi-site studies.  
+
+
+It combines **interactive visualization** and **statistical testing** to help users detect unwanted site effects, harmonize data across scanners or batches, and analyze results in a single, integrated workflow.
+
+<img src="figure/ComBatFamQC.png" width="110%" style="display: block; margin: auto;" />
+
+## Key Features
+
+**[ComBatFamQC]{style="color:#C83F49"}** integrates several powerful tools that guide users through the complete harmonization process, from detecting batch effects to generating harmonized and analysis-ready data.
+
+#### Built-in Harmonization
+- Provides four harmonization methods:  
+  **ComBat**, **Longitudinal ComBat**, **ComBat-GAM**, and **CovBat**  
+- Preserves important covariates such as age, sex, and diagnosis  
+- Produces harmonized data that are directly comparable across sites
+
+#### Batch Effect Diagnostics
+- Identify and measure batch effects through **interactive visualizations** and **statistical tests**  
+- Evaluate harmonization quality and detect remaining site-related variation
+
+#### Post-Harmonization Analysis
+- Visualize **life-span age trends** across brain regions  
+- Generate **covariate-corrected residuals** for downstream statistical or machine learning analyses
+
+
+## Usage Options
+**[ComBatFamQC]{style="color:#C83F49"}** offers two user-friendly ways to fit different analysis needs:
+
+- **R Shiny interface** for interactive exploration and visualization  
+- **Command-line tools** for automated and large-scale processing:  
+  `CombatQC_CLI.R` for diagnostics and harmonization  
+  `post_CLI.R` for post-harmonization visualization and residual generation
+
+## Learn More
+
+- Visit [**Get Started**](about.qmd) for installation, command-line usage, and vignette access.

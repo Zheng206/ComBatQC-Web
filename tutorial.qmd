@@ -1,0 +1,286 @@
+---
+title: "Tutorials"
+toc: true
+toc-depth: 4
+format:
+  html:
+    code-fold: false
+    embed-resources: false   
+resources:
+  - figure/*                      
+execute:
+  echo: false
+  warning: false
+  message: false
+  eval: true
+  freeze: false
+---
+
+## Typical Workflow
+
+The **[ComBatFamQC]{style="color:#C83F49"}** workflow guides users from raw multi-site data to harmonized, analysis-ready results. You can run the full workflow using the **R Shiny app** or the **command-line interface**.
+
+### 1. Data Preparation
+Start with your unharmonized dataset that includes:
+
+- A **feature matrix** (e.g., cortical thickness, volume, or connectivity)
+- A **metadata file** containing covariates such as site, age, sex, and diagnosis  
+
+### 2. [Batch Effect Diagnostics](#diagnostic)
+Detect and measure site-related variation using **interactive plots** and **statistical tests**, including:
+
+- **Interactive Plots**: Residual Box Plots, Exploratory Density Plots, PCA/t-SNE Plots
+- **Statistical Tests**: ANOVA, Kruskal-Wallis, Levene's, Bartlett's tests
+
+These diagnostics help determine whether harmonization is required and which method to apply.
+
+### 3. [Harmonization and Post-Analysis](#age)
+Apply one of four harmonization methods (**ComBat**, **Longitudinal ComBat**, **ComBat-GAM**, or **CovBat**) to remove site effects while preserving biological variability. After harmonization, reassess batch effects, explore **age trends**, and generate **residual datasets** for downstream analysis.
+
+The **interactive workflow** can be found below:
+
+```{r}
+library(visNetwork)
+library(jsonlite)
+library(knitr)      
+
+IMG <- list(
+  "1" = knitr::image_uri("figure/unharm_data.png"),
+  "2" = knitr::image_uri("figure/interactive.png"),
+  "3" = knitr::image_uri("figure/out_harm_predict.png"),
+  "4" = knitr::image_uri("figure/age_plot.png")
+)
+IMG_JSON <- jsonlite::toJSON(IMG, auto_unbox = TRUE)
+
+nodes <- data.frame(
+  id = c(1, 2, 3, 4),
+  label = c(
+    "Unharmonized Dataset",
+    "Interactive Batch Effect Diagnostic",
+    "Harmonized Dataset",
+    "Post-harmonization Analysis"
+  ),
+  title = c(
+    "Raw data before correction",
+    "Explore/visualize batch effects",
+    "After harmonization",
+    "Downstream analyses after harmonization"
+  ),
+  x = c(0, 120, 240, 500),
+  y = c(0, 180, 0, 0)
+)
+
+edges <- data.frame(
+  id = c("UtoD","DtoH","UtoH","HtoP"),
+  from = c(1, 2, 1, 3),
+  to   = c(2, 3, 3, 4),
+  dashes = c(FALSE, FALSE, TRUE, FALSE),
+  arrows = "to",
+  title  = c(
+    "Start an interactive diagnostic session through the Shiny app",
+    "In-sample harmonization",
+    "Both in-sample and out-of-sample harmonization",
+    "Post-harmonization analysis"
+  )
+)
+
+pal <- list(
+  input = list(
+    background = "#E6F0FF",  
+    border     = "#1D4ED8", 
+    highlight  = list(background = "#DCEBFF", border = "#1E40AF")
+  ),
+  diagnostic = list(
+    background = "#FFF7E6",  
+    border     = "#B45309",  
+    highlight  = list(background = "#FFEDCC", border = "#92400E")
+  ),
+  output = list(
+    background = "#ECFDF5",  
+    border     = "#065F46",  
+    highlight  = list(background = "#D1FAE5", border = "#064E3B")
+  ),
+  post = list(
+    background = "#F5F3FF", 
+    border     = "#5B21B6",  
+    highlight  = list(background = "#EDE9FE", border = "#4C1D95")
+  )
+)
+
+nodes$group <- c("input","diagnostic","output","post")
+
+g <- visNetwork(nodes, edges, width = "100%", height = "420px") %>%
+  visNodes(
+    shape = "box",
+    fixed = list(x = TRUE, y = TRUE),
+    font  = list(color = "#1F2937", size = 16, bold=TRUE),
+    widthConstraint  = list(minimum = 45),   # wider boxes
+    heightConstraint = list(minimum = 45),    # taller boxes (optional)
+    margin = list(top = 4, right = 4, bottom = 4, left = 4) 
+  ) %>%
+  visGroups(groupname = "input",      color = pal$input) %>%
+  visGroups(groupname = "diagnostic", color = pal$diagnostic) %>%
+  visGroups(groupname = "output",     color = pal$output) %>%
+  visGroups(groupname = "post",       color = pal$post) %>%
+  visEdges(
+  arrows = list(to = list(enabled = TRUE, scaleFactor = 1)),  # adjust here
+  smooth = list(enabled = TRUE),
+  color = list(
+    color     = "#9E9E9E",
+    highlight = "#1565C0",
+    hover     = "#1565C0"
+  ),
+  width = 2
+  )%>%
+  visOptions(highlightNearest = list(enabled = TRUE, hover = TRUE)) %>%
+  visPhysics(enabled = FALSE) %>%
+  visInteraction(
+    hover = TRUE,
+    tooltipDelay = 50,
+    multiselect = FALSE,
+    selectConnectedEdges = FALSE,
+    dragNodes = FALSE,   # prevent node dragging
+    dragView  = FALSE,   # prevent panning
+    zoomView  = FALSE    # prevent zooming
+  ) %>%
+  visEvents(
+    selectNode = sprintf("
+      function(params){
+        var panel = document.getElementById('node-figure'); if(!panel) return;
+        var IMG = %s;
+        var n = String(params.nodes[0]);
+        var src = IMG[n];
+        if(src){
+          panel.innerHTML = '<img src=\"' + src + '\" style=\"max-width:100%%\" />';
+        } else {
+          panel.innerHTML = '<div style=\"padding:.75rem;\">No figure configured for node ' + n + '.</div>';
+        }
+      }", IMG_JSON),
+    click = sprintf("
+      function(params){
+        if(params.nodes && params.nodes.length){
+          var panel = document.getElementById('node-figure'); if(!panel) return;
+          var IMG = %s;
+          var n = String(params.nodes[0]);
+          var src = IMG[n];
+          if(src){
+            panel.innerHTML = '<img src=\"' + src + '\" style=\"max-width:100%%\" />';
+          }
+          return;
+        }
+      }", IMG_JSON),
+    selectEdge = "
+      function(params){
+        var panel = document.getElementById('node-figure'); if(!panel) return;
+        var id = params.edges[0];
+        var msg = {
+          'DtoH': 'Currently, only in-sample harmonization is supported through the interactive harmonization section.',
+          'UtoH': 'Both in-sample and out-of-sample harmonization are supported! It is more suitable for large datasets and requires a good understanding of which method to use.',
+          'UtoD': 'Pass the data to the diagnostic stage! This step is recommended to better understand which harmonization method to use!',
+          'HtoP': 'Proceed to post-harmonization analysis! We currently provide two powerful tools for users to consider: (1) Customized Residual Generation and (2) Lifespan Age Trend Visualization.'
+        }[id];
+        if(msg){
+          panel.innerHTML =
+            '<div style=\"border:1px solid #ddd;padding:.75rem;border-radius:.25rem;\">' +
+            '<strong>Link explanation:</strong> ' + msg + '</div>';
+        }
+      }
+    "
+  )
+g
+
+```
+
+<div id="node-figure" style="margin-top:1rem;border:1px solid #ddd;padding:.75rem;border-radius:.25rem;">
+  <em>Click a node above to display a related figure here, or click an edge to see its explanation.</em>
+</div>
+
+
+
+## Tutorial Videos
+
+---
+
+### Interactive Batch Effect Diagnostic {#diagnostic}
+
+
+#### Data Overview
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/5OJU4oVZ6Ow >}}
+
+ComBatFamQC: Data Overview  
+This video introduces the ComBatFamQC interface and data structure, showing how input data are organized and prepared for harmonization.
+
+:::
+
+#### Summary
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/cLI9WkCPLF8 >}}
+
+ComBatFamQC: Summary  
+An overview of key summary statistics and visual outputs generated after harmonization, illustrating how ComBatFamQC evaluates data consistency.
+
+:::
+
+#### Residual Plot
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/EME2-E3UEXI >}}
+
+ComBatFamQC: Residual Plot  
+This tutorial explains how to interpret residual plots to assess whether batch effects remain after harmonization.
+
+:::
+
+#### Diagnosis of Global Batch Effect
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/-CDK0qx5_xI >}}
+
+ComBatFamQC: Diagnosis of Global Batch Effect  
+Learn how to identify and visualize overall batch effects across datasets, helping ensure harmonization quality at a global level.
+
+:::
+
+#### Diagnosis of Individual Batch Effect
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/UBTw3REUlSw >}}
+
+ComBatFamQC: Diagnosis of Individual Batch Effect  
+This video focuses on assessing individual batch-level differences and detecting potential sources of variation after correction.
+
+:::
+
+#### Interactive Harmonization
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/CyAxIY9Cagk >}}
+
+ComBatFamQC: Interactive Harmonization  
+Explore how to use the interactive ComBatFamQC interface to fine-tune harmonization parameters and visualize real-time effects.
+
+:::
+
+### Post-harmonization Analysis {#age}
+
+---
+
+#### Interactive Life Span Age Trend
+
+::: {#fig-cern}
+
+{{< video https://youtu.be/XxYPA1j9_Xs >}}
+
+Brain ROI Age Trend Visualization  
+This tutorial demonstrates how to visualize age-related changes across brain regions, highlighting lifespan trends using interactive plots.
+
+:::

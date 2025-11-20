@@ -1,0 +1,90 @@
+---
+title: "Get Started"
+format:
+  html:
+    code-tools: false       # Adds copy button
+    code-block-bg: true    # Keeps background for code
+    code-block-border-left: "#00bfa5"  # Optional accent color
+---
+
+## Installation
+
+---
+
+You can install the latest version of **[ComBatFamQC]{style="color:#C83F49"}** directly from GitHub using the R package **devtools**.
+
+1. Open R or RStudio  
+2. Run the following commands:
+
+```{r}
+#| class: highlight-chunk
+if (!require("devtools", quietly = TRUE)) {
+  install.packages("devtools")}
+library(devtools)
+install_github("Zheng206/ComBatFamQC", build_vignettes = TRUE)
+```
+
+## Usage Options
+
+---
+
+**[ComBatFamQC]{style="color:#C83F49"}** can be used in two main modes depending on your workflow needs.
+
+#### 1. Interactive Mode
+
+Use the [R Shiny app]{style="color:#8D38C9"} to explore data, check batch effects, and perform harmonization interactively. 
+
+**[ComBatFamQC]{style="color:#C83F49"}** can also be used directly in R or RStudio for scripted workflows after loading the package:
+
+```{r}
+#| class: highlight-chunk
+library(ComBatFamQC)
+```
+
+#### 2. Command-Line Mode
+
+Use the [command-line interface]{style="color:#8D38C9"} for automated, scalable processing of large or scripted analyses.
+
+After installing **[ComBatFamQC]{style="color:#C83F49"}** in R, you can quickly access the built-in CLI scripts by running the following commands in your terminal:
+```{bash}
+#| class: highlight-chunk
+RSCRIPT=${RSCRIPT:-$(command -v Rscript)}
+combatqc_cli="$($RSCRIPT -e 'cat(system.file("combatQC_CLI.R", package="ComBatFamQC"))')"
+post_cli="$($RSCRIPT -e 'cat(system.file("post_CLI.R", package="ComBatFamQC"))')"
+
+# Display usage information
+Rscript "$combatqc_cli" -h
+Rscript "$post_cli" -h
+```
+
+Alternatively, run directly using explicit paths:
+
+```{r}
+#| class: highlight-chunk
+Rscript path/to/CombatQC_CLI.R -h
+Rscript path/to/post_CLI.R -h
+```
+
+**Scripts Overview**:
+
+- The `CombatQC_CLI.R` script: the [batch effect diagnostics]{style="color:#50C878"} and [harmonization]{style="color:#728FCE"} stage, providing interactive tools to diagnose and adjust for batch effects effectively.
+
+- The `post_CLI.R` script: the [post-harmonization]{style="color:#E56E94"} stage, where users can visualize age trends across various brain structures and generate a residual dataset that excludes the effects of unwanted covariates.
+
+## View Vignettes
+
+---
+
+**[ComBatFamQC]{style="color:#C83F49"}** includes built-in vignettes that provide detailed, step-by-step examples.
+```{r}
+#| class: highlight-chunk
+vignette("ComBatQC")
+vignette("Post-Harmonization")
+```
+
+
+## Learn More
+
+- See the [**Methods Guide**](method.qmd) for detailed explanations of the harmonization algorithms
+
+

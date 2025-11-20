@@ -1,0 +1,36 @@
+---
+title: "Help"
+---
+
+## Frequently Asked Questions (FAQ)
+
+#### 1. What is ComBatFamQC?
+ComBatFamQC is an R package designed for batch effect diagnostics, data harmonization, and post-harmonization analysis in multi-site studies.  
+It helps identify and correct unwanted site or scanner effects while preserving biological signals.
+
+#### 2. Can I use ComBatFamQC without R?
+
+Yes. The package includes command-line scripts that can be run directly in your terminal for automated or large-scale processing.
+
+#### 3. What harmonization methods are supported?
+
+ComBatFamQC integrates four type of first time harmonization methods: Original ComBat, Longitudinal ComBat, ComBat-GAM, CovBat
+In addition, ComBatFamQC supports out-of-sample harmonization using ComBat and CovBat, allowing new data to be harmonized based on previously fitted models.
+
+#### 4. What input data format is required?
+
+You’ll need:
+
+- A feature matrix (subjects × features; e.g., cortical thickness, volume, or connectivity)
+
+- A metadata file including the batch variable (e.g., site/scanner) and relevant covariates such as age, sex, and diagnosis.
+
+
+## Get Support
+
+If you have a question about this package, please open an [issue](https://github.com/PennSIVE/ComBatFamQC/issues) on GitHub. The maintainers will be notified about your post and will respond when they’re able.
+
+If you have used ComBatFamQC in your research and would like to share a summary of your work as a blog post on this website, please open an [issue](https://github.com/PennSIVE/ComBatFamQC/issues). The maintainers will collaborate with you to create and publish your post.
+
+
+Last updated: November 2025

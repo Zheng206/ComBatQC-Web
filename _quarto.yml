@@ -1,0 +1,53 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "ComBatFamQC"
+  navbar:
+    left:
+      - icon: play-circle
+        text: "Get Started"
+        href: about.qmd
+      - icon: book
+        text: "Methods Guide"
+        href: method.qmd
+      - icon: file-text
+        text: "Example"
+        menu:
+          - icon: window
+            text: "Batch Effect Diagnosis"
+            href: diagnostic.qmd
+          - icon: clipboard-data
+            text: "Harmonization"
+            href: harmonization.qmd
+          - icon: graph-up
+            text: "Post-Harmonization Downstream Analysis"
+            href: post.qmd
+      - icon: youtube
+        text: "Tutorials"
+        href: tutorial.qmd
+    right:
+      - icon: archive
+        text: "References"
+        href: references.qmd
+      - icon: newspaper
+        text: "News"
+        href: news.qmd
+      - icon: question-circle
+        text: "Help"
+        href: help.qmd
+      - icon: github
+        href: https://github.com/Zheng206/ComBatFamQC
+
+format:
+  html:
+    theme: minty
+    css: styles.css
+    toc: true
+
+execute:
+  freeze: auto
+  echo: true
+  eval: false
+

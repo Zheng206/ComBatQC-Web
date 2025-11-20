@@ -1,0 +1,9 @@
+/* css styles */
+
+.highlight-chunk {
+  background: #e8f4f4;
+  max-width: 100%;  
+  border: 0.8px solid #b0c2e8;
+  border-radius: 1px;
+  padding: 0.5rem 1.2rem;
+}
